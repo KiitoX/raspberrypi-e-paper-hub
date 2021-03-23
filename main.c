@@ -26,9 +26,9 @@ int main() {
     signal(SIGINT, signal_handler);
 #endif
 
-    char *file = "./fonts/scientifica-11.bdf";
+    char *file = "./fonts/cozette.bdf";
 
-    bdf_t *font = bdf_read(file, 2);
+    bdf_t *font = bdf_read(file, 1);
 
 #ifdef EPD
     assert(DEV_Module_Init() == 0);

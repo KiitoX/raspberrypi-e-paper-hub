@@ -19,7 +19,7 @@ More importantly though, it is licensed under the MIT license. I'm gonna take th
 ## Fonts
 
 I've looked at a variety of bitmap fonts to find something that is to my liking, but this project supports any font in [`.bdf`](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) format.  
-I have included the fonts [Scientifica](https://github.com/NerdyPepper/scientifica) (11pt), and [Kakwa](https://github.com/kakwa/kakwafont) (12pt), for convenience, with both being licensed under the Open Font License.  
+I have included the fonts [Scientifica](https://github.com/NerdyPepper/scientifica) (11pt), [Kakwa](https://github.com/kakwa/kakwafont) (12pt), and [Cozette](https://github.com/slavfox/Cozette) (13pt) for convenience, with all three being licensed under the Open Font License.  
 Further I can recommend:
 * [Lode](https://github.com/hishamhm/lode-fonts/) 15pt, quite a bit of language support (though rtl is not supported in my code)
 * [CtrlD](https://github.com/bjin/ctrld-font) 10pt, 13pt, 16pt
