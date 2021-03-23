@@ -740,6 +740,7 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
         if (character == '\n') {
             x = xPos;
             y += font->height * font->scale;
+            string++;
             continue;
         }
 
