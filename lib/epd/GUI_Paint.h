@@ -144,7 +144,7 @@ void Paint_DrawNum(UWORD Xpoint, UWORD Ypoint, int32_t Nummber, sFONT* Font, UWO
 void Paint_DrawTime(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, sFONT* Font, UWORD Color_Foreground, UWORD Color_Background);
 #else
 #include "../bdf.h"
-int Paint_DrawChar(UWORD xPos, UWORD yPos, char character, bdf_t *font, UWORD color_fg, UWORD color_bg);
+int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UWORD color_fg, UWORD color_bg);
 void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg);
 #endif
 

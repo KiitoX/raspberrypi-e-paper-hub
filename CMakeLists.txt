@@ -17,4 +17,4 @@ add_executable(epaper main.c lib/bdf.c ${EPD_LIB})
 
 target_link_libraries(epaper -lbcm2835 -lm)
 
-#target_link_libraries(epaper -fsanitize=address)
+#target_link_options(epaper -fsanitize=address)

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <signal.h>
+#include <locale.h>
 
 #include "lib/bdf.h"
 
@@ -16,6 +17,10 @@ int main() {
     /**
      * Init
      */
+
+    // disable locale specific string handling
+    // enables UTF-8 to multi-byte handling
+    setlocale(LC_ALL, "");
 
 #ifdef EPD
     signal(SIGINT, signal_handler);
@@ -92,7 +97,7 @@ int main() {
     Paint_DrawCircle(250, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
 
-    Paint_DrawString(10, 310, "hello! e-paper", font, WHITE, BLACK);
+    Paint_DrawString(10, 310, "hello! e-paper", font, WHITE, RED);
     Paint_DrawString(10, 360, "0123456789", font, RED, WHITE);
 
     EPD_0583_1_Display(image_black, image_red);

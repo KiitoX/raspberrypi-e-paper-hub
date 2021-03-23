@@ -13,9 +13,7 @@
 #include <assert.h>
 #include <errno.h>
 
-// uint8_t is be enough if you only need ascii characters
-// uint32_t is required if you need specialised math, cjk, and/or emoji
-typedef uint16_t encoding_t;
+typedef wchar_t encoding_t;
 
 typedef struct {
 #ifdef BDF_CHARNAME

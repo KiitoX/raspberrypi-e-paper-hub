@@ -9,6 +9,7 @@ EastRising Technology Co.,LTD
 #include <stdlib.h>
 #include <string.h> //memset()
 #include <math.h>
+#include <wchar.h>
 
 PAINT Paint;
 
@@ -687,7 +688,7 @@ void Paint_DrawTime(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, sFONT* Font,
 
 #else
 
-int Paint_DrawChar(UWORD xPos, UWORD yPos, char character, bdf_t *font, UWORD color_fg, UWORD color_bg) {
+int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UWORD color_fg, UWORD color_bg) {
     if (xPos > Paint.Width || yPos > Paint.Height) {
         Debug("Paint_DrawChar: Input exceeds display boundary\n");
         return 0;
@@ -730,6 +731,13 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
 
     UWORD x = xPos, y = yPos;
 
+    mbstate_t state = { 0 };
+    // fail if this isn't the required initial state
+    assert(mbsinit(&state) == 0);
+
+    encoding_t character;
+    size_t offset;
+
     while (*string != '\0') {
         // move to new line at x boundary
         if ((x + font->width * font->scale) > Paint.Width) {
@@ -743,8 +751,14 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
             y = yPos;
         }
 
-        x += Paint_DrawChar(x, y, *string, font, color_fg, color_bg);
-        string++;
+        offset = mbrtowc(&character, string, MB_CUR_MAX, &state);
+        if (offset <= 0) {
+            Debug("Paint_DrawString: String contains invalid UTF-8 characters")
+            return;
+        }
+
+        x += Paint_DrawChar(x, y, character, font, color_fg, color_bg);
+        string += offset;
     }
 }
 #endif
