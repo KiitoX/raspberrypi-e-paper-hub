@@ -35,8 +35,8 @@ void read_header(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font) {
                           &(font->offsetX), &(font->offsetY)) == 4);
 #ifdef DEBUG
             printf("scan: w = %hhu, h = %hhu, x = %hhd, y = %hhd\n\n",
-                   font->fontBounds.width, font->fontBounds.height,
-                   font->fontBounds.offsetX, font->fontBounds.offsetY);
+                   font->width, font->height,
+                   font->offsetX, font->offsetY);
 #endif
         }
     } while (!starts_with(buffer, "STARTPROPERTIES"));
@@ -115,8 +115,8 @@ void read_character(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font, b
                           &(bitmap->offsetX), &(bitmap->offsetY)) == 4);
 #ifdef DEBUG
             printf("scan: w = %hhu, h = %hhu, x = %hhd, y = %hhd\n\n",
-                   bitmap->charBounds.width, bitmap->charBounds.height,
-                   bitmap->charBounds.offsetX, bitmap->charBounds.offsetY);
+                   bitmap->width, bitmap->height,
+                   bitmap->offsetX, bitmap->offsetY);
 #endif
         }
     } while (!starts_with(buffer, "BITMAP"));
