@@ -694,6 +694,10 @@ int Paint_DrawChar(UWORD xPos, UWORD yPos, char character, bdf_t *font, UWORD co
     }
 
     bitmap_t *bitmap = bdf_get_bitmap(font, character);
+    if (bitmap == NULL) {
+        Debug("Paint_DrawChar: Character is not in bitmap\n");
+        return 0;
+    }
 
     size_t byte_width = ((bitmap->width + 7) / 8);
 
