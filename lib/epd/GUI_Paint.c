@@ -687,7 +687,7 @@ int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UW
 
     bitmap_t *bitmap = bdf_get_bitmap(font, character);
     if (bitmap == NULL) {
-        Debug("Paint_DrawChar: Character is not in bitmap\n");
+        Debug("Paint_DrawChar: Character '%lc' U+%04llX is not in bitmap\n",  character, character);
         return 0;
     }
 
