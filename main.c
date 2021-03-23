@@ -21,7 +21,7 @@ int main() {
     signal(SIGINT, signal_handler);
 #endif
 
-    char *file = "./LodeSansMono-15.bdf";
+    char *file = "./fonts/scientifica-11.bdf";
 
     bdf_t *font = bdf_read(file, 1);
 
@@ -50,17 +50,6 @@ int main() {
     /**
      * Main
      */
-
-    /*
-    puts("");
-    printf("font: %ld characters, %hhd pt, bounds: %hhu %hhu %hhd %hhd\n", font->numChars, font->size, font->fontBounds.width, font->fontBounds.height, font->fontBounds.offsetX, font->fontBounds.offsetY);
-    puts("");
-
-    for (int i = 0; i < 250; ++i) {
-        bdf_print_bitmap(font, &font->characters[i]);
-        puts("");
-    }
-    */
 
 #ifdef EPD
     // Draw black image
