@@ -736,8 +736,15 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
             return;
         }
 
-        // move to new line at newline or x boundary
-        if (character == '\n' || (x + font->width * font->scale) > Paint.Width) {
+        // move to new line, and skip newline character
+        if (character == '\n') {
+            x = xPos;
+            y += font->height * font->scale;
+            continue;
+        }
+
+        // move to new line at x boundary
+        if ((x + font->width * font->scale) > Paint.Width) {
             x = xPos;
             y += font->height * font->scale;
         }
