@@ -26,4 +26,4 @@ Further I can recommend:
 * [Creep](https://github.com/romeovs/creep) 12pt
 * [Terminus](http://terminus-font.sourceforge.net/) 6pt to 16pt
 
-For my bigger screen a lot of these smaller fonts are going to be used in 2x scale, but for a smaller screen you 
+For my bigger screen a lot of these smaller fonts are going to be used in 2x scale, but for a smaller screen you may well want to go for 1x.
