@@ -730,8 +730,14 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
     size_t offset;
 
     while (*string != '\0') {
-        // move to new line at x boundary
-        if ((x + font->width * font->scale) > Paint.Width) {
+        offset = mbrtowc(&character, string, MB_CUR_MAX, &state);
+        if (offset <= 0) {
+            Debug("Paint_DrawString: String contains invalid UTF-8 characters");
+            return;
+        }
+
+        // move to new line at newline or x boundary
+        if (character == '\n' || (x + font->width * font->scale) > Paint.Width) {
             x = xPos;
             y += font->height * font->scale;
         }
@@ -740,12 +746,6 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
         if ((y + font->height * font->scale) > Paint.Height) {
             x = xPos;
             y = yPos;
-        }
-
-        offset = mbrtowc(&character, string, MB_CUR_MAX, &state);
-        if (offset <= 0) {
-            Debug("Paint_DrawString: String contains invalid UTF-8 characters");
-            return;
         }
 
         x += Paint_DrawChar(x, y, character, font, color_fg, color_bg);
