@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 11)
 #set(CMAKE_BUILD_TYPE "Debug")
 
 #add_compile_definitions(DEBUG)
+#add_compile_definitions(BDF_DEBUG)
 #add_compile_definitions(BDF_TEST)
 #add_compile_definitions(BDF_CHARNAME)
 

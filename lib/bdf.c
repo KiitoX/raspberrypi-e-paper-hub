@@ -19,21 +19,21 @@ void read_header(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font) {
         assert(fgets(buffer, buf_len, bdf_file) != NULL);
 
         if (starts_with(buffer, "SIZE")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "SIZE %hhu", &(font->size)) == 1);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: size = %hhu\n\n", font->size);
 #endif
         } else if (starts_with(buffer, "FONTBOUNDINGBOX")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "FONTBOUNDINGBOX %hhu %hhu %hhd %hhd",
                           &(font->width), &(font->height),
                           &(font->offsetX), &(font->offsetY)) == 4);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: w = %hhu, h = %hhu, x = %hhd, y = %hhd\n\n",
                    font->width, font->height,
                    font->offsetX, font->offsetY);
@@ -47,27 +47,27 @@ void read_properties(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font) 
         assert(fgets(buffer, buf_len, bdf_file) != NULL);
 
         if (starts_with(buffer, "FONT_ASCENT")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "FONT_ASCENT %hhu", &(font->ascent)) == 1);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: ascent = %hhu\n\n", font->ascent);
 #endif
         } else if (starts_with(buffer, "FONT_DESCENT")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "FONT_DESCENT %hhu", &(font->descent)) == 1);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: descent = %hhu\n\n", font->descent);
 #endif
         } else if (starts_with(buffer, "DEFAULT_CHAR")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "DEFAULT_CHAR %hhu", &(font->defaultChar)) == 1);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: default = %hhu\n\n", font->defaultChar);
 #endif
         }
@@ -78,11 +78,11 @@ void read_character(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font, b
     assert(fgets(buffer, buf_len, bdf_file) != NULL);
     assert(starts_with(buffer, "STARTCHAR"));
 #ifdef BDF_CHARNAME
-#ifdef DEBUG
+#ifdef BDF_DEBUG
     printf("read: %s", buffer);
 #endif
     assert(sscanf(buffer, "STARTCHAR %ms", &bitmap->name) == 1);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
     printf("scan: charname = %s\n\n", bitmap->name);
 #endif
 #endif
@@ -91,29 +91,29 @@ void read_character(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font, b
         assert(fgets(buffer, buf_len, bdf_file) != NULL);
 
         if (starts_with(buffer, "ENCODING")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "ENCODING %hu", &(bitmap->encoding)) == 1);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: encoding = %hu\n\n", bitmap->encoding);
 #endif
         } else if (starts_with(buffer, "DWIDTH")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "DWIDTH %hhu", &(bitmap->deviceWidth)) == 1);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: width = %hhu\n\n", bitmap->deviceWidth);
 #endif
         } else if (starts_with(buffer, "BBX")) {
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("read: %s", buffer);
 #endif
             assert(sscanf(buffer, "BBX %hhu %hhu %hhd %hhd",
                           &(bitmap->width), &(bitmap->height),
                           &(bitmap->offsetX), &(bitmap->offsetY)) == 4);
-#ifdef DEBUG
+#ifdef BDF_DEBUG
             printf("scan: w = %hhu, h = %hhu, x = %hhd, y = %hhd\n\n",
                    bitmap->width, bitmap->height,
                    bitmap->offsetX, bitmap->offsetY);
