@@ -23,7 +23,7 @@ int main() {
 
     char *file = "./fonts/scientifica-11.bdf";
 
-    bdf_t *font = bdf_read(file, 1);
+    bdf_t *font = bdf_read(file, 2);
 
 #ifdef EPD
     assert(DEV_Module_Init() == 0);
@@ -43,8 +43,8 @@ int main() {
     image_red = malloc(image_size);
     assert(image_red != NULL);
 
-    Paint_NewImage(image_black, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_0, WHITE);
-    Paint_NewImage(image_red, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_0, WHITE);
+    Paint_NewImage(image_black, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_180, WHITE);
+    Paint_NewImage(image_red, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_180, WHITE);
 #endif
 
     /**
@@ -66,7 +66,7 @@ int main() {
     Paint_DrawLine(100, 200, 100, 300, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     Paint_DrawLine(50, 250, 150, 250, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
-    Paint_DrawString(10, 335, "www.buydisplay.com", font, BLACK, WHITE);
+    Paint_DrawString(10, 335, "testing the black font", font, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
@@ -79,8 +79,8 @@ int main() {
     Paint_DrawCircle(250, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
 
-    Paint_DrawString(10, 310, "hello! EPD", font, WHITE, BLACK);
-    Paint_DrawString(10, 360, "123456789", font, RED, WHITE);
+    Paint_DrawString(10, 310, "hello! e-paper", font, WHITE, BLACK);
+    Paint_DrawString(10, 360, "0123456789", font, RED, WHITE);
 
     EPD_0583_1_Display(image_black, image_red);
     DEV_Delay_ms(30000);
