@@ -733,7 +733,7 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
 
     mbstate_t state = { 0 };
     // fail if this isn't the required initial state
-    assert(mbsinit(&state) == 0);
+    assert(mbsinit(&state) != 0);
 
     encoding_t character;
     size_t offset;
