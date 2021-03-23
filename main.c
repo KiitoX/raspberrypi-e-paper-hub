@@ -51,6 +51,19 @@ int main() {
      * Main
      */
 
+#ifdef BDF_TEST
+    puts("");
+    printf("font: %ld characters, %hhd pt, bounds: %hhu %hhu %hhd %hhd\n", font->numChars, font->size, font->width, font->height, font->offsetX, font->offsetY);
+    puts("");
+
+    for (int i = 0; i < 250; ++i) {
+        bdf_print_bitmap(font, &font->characters[i]);
+        puts("");
+    }
+
+    bdf_print_bitmap(font, bdf_get_bitmap(font, 1033));
+#endif
+
 #ifdef EPD
     // Draw black image
     Paint_SelectImage(image_black);

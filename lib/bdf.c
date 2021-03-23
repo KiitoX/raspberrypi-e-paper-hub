@@ -123,15 +123,19 @@ void read_character(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font, b
 
     // round the width to the nearest multiple of eight required to fit it
     size_t byte_width = ((bitmap->width + 7) / 8);
-    size_t required_bytes = byte_width * bitmap->height;
-    bitmap->bits = malloc(sizeof(*bitmap->bits) * required_bytes);
+    bitmap->bits = malloc(sizeof(*bitmap->bits) * byte_width * bitmap->height);
     assert(bitmap->bits != NULL);
 
+    char byte[3] = "00\0";
+
     errno = 0;
-    for (int i = 0; i < required_bytes; ++i) {
+    for (int y = 0; y < bitmap->height; ++y) {
         assert(fgets(buffer, buf_len, bdf_file) != NULL);
-        bitmap->bits[i] = strtol(buffer, NULL, 16);
-        assert(errno == 0);
+        for (int x = 0; x < byte_width; ++x) {
+            strncpy(byte, buffer + x * 2, 2);
+            bitmap->bits[y * byte_width + x] = strtol(byte, NULL, 16);
+            assert(errno == 0);
+        }
     }
 
     assert(fgets(buffer, buf_len, bdf_file) != NULL);

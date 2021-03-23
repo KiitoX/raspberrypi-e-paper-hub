@@ -4,6 +4,7 @@ project(epaper C)
 set(CMAKE_C_STANDARD 11)
 
 #add_compile_definitions(DEBUG)
+#add_compile_definitions(BDF_TEST)
 #add_compile_definitions(BDF_CHARNAME)
 
 add_compile_definitions(USE_BCM2835_LIB RPI EPD)
