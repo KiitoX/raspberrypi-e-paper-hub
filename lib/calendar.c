@@ -259,7 +259,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     for (i = 0; i < 7; ++i) {
         x = 61 + i * 82;
         Paint_DrawLine(x, 74, x, 104, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
-        Paint_DrawLine(x, 104, x, h - 16, WHITE, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
+        //Paint_DrawLine(x, 104, x, h - 16, WHITE, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
 
         struct tm day = *boundary.tm_start;
         day.tm_mday += i;
