@@ -190,14 +190,18 @@ void free_week_boundaries(t_week_boundary boundary) {
 
 #ifdef EPD
 
-void draw_event(char *text, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
+void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
     uint16_t x = 67 + day_of_week * 82;
     uint16_t w = 70;
     uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
     uint16_t h = quarter_length * 11 + ((quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1));
 
     printf("x:%d, y:%d, w:%d, h:%d\n", x, y, w, h);
-    Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    Paint_SelectImage(image_black);
+    Paint_DrawRectangle(x, y, x + w, y + h, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+    Paint_SelectImage(image_red);
+    Paint_DrawString(x, y, text, font, RED, WHITE);
 }
 
 void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
@@ -285,15 +289,15 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     Paint_DrawLine(100, 0, 100, h, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     Paint_DrawLine(0, 300, w, 300, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);*/
 
-    draw_event("", 0, 3, DAY_SUNDAY);
-    draw_event("", 3, 2, DAY_SUNDAY);
-    draw_event("", 5, 1, DAY_TUESDAY);
+    draw_event(image_black, image_red, "length", font_small, 0, 3, DAY_SUNDAY);
+    draw_event(image_black, image_red, "of", font_small, 3, 2, DAY_SUNDAY);
+    draw_event(image_black, image_red, "events", font_small, 5, 1, DAY_TUESDAY);
     for (int j = 0; j < 12; ++j) {
-        draw_event("", j, 1, DAY_WEDNESDAY);
+        draw_event(image_black, image_red, "loop test", font_small, j, 1, DAY_WEDNESDAY);
     }
-    draw_event("", 8, 4, DAY_THURSDAY);
-    draw_event("", 12, 1, DAY_THURSDAY);
-    draw_event("", 13, 2, DAY_THURSDAY);
+    draw_event(image_black, image_red, "Smalltalk", font_small, 8, 4, DAY_THURSDAY);
+    draw_event(image_black, image_red, "Some Meeting", font_small, 12, 1, DAY_THURSDAY);
+    draw_event(image_black, image_red, "Call me", font_small, 13, 2, DAY_THURSDAY);
 
     bdf_free(font_large);
     bdf_free(font_large_mono);
