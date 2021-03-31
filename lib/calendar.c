@@ -200,6 +200,10 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     bdf_t *font3x = bdf_read(file, 3);
     bdf_t *font2x = bdf_read(file, 2);
 
+    // Clear images
+    Paint_SelectImage(image_red);
+    Paint_Clear(WHITE);
+
     // Draw black image
     Paint_SelectImage(image_black);
     Paint_Clear(WHITE);
@@ -244,7 +248,6 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     // Draw red picture
     Paint_SelectImage(image_red);
-    Paint_Clear(WHITE);
 
     bdf_free(font3x);
     bdf_free(font2x);
