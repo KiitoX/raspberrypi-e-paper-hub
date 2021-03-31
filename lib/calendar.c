@@ -197,7 +197,7 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, u
     uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1);
     uint16_t h = quarter_length * 11 + skip_borders;
 
-    printf("x:%d, y:%d, w:%d, h:%d on %d, at %d+%d with borders: %d\n", x, y, w, h, day_of_week, quarter_offset, quarter_length, skip_borders);
+    printf("x:%d, y:%d, w:%d, h:%d; %s on %d, at %d+%d with borders: %d\n", x, y, w, h, text, day_of_week, quarter_offset, quarter_length, skip_borders);
     Paint_SelectImage(image_red);
     Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
@@ -297,8 +297,8 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         draw_event(image_black, image_red, "loop test", font_small, j, 1, DAY_WEDNESDAY);
     }
     draw_event(image_black, image_red, "Smalltalk", font_small, 3, 4, DAY_THURSDAY);
-    draw_event(image_black, image_red, "Smalltalk", font_small, 7, 1, DAY_THURSDAY);
-    draw_event(image_black, image_red, "Smalltalk", font_small, 8, 4, DAY_THURSDAY);
+    draw_event(image_black, image_red, "Smalltalk2", font_small, 7, 1, DAY_THURSDAY);
+    draw_event(image_black, image_red, "Smalltalk3", font_small, 8, 4, DAY_THURSDAY);
     draw_event(image_black, image_red, "Some Meeting", font_small, 12, 1, DAY_THURSDAY);
     draw_event(image_black, image_red, "Call me", font_small, 13, 2, DAY_THURSDAY);
 
