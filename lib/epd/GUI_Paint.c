@@ -294,7 +294,7 @@ void Paint_DrawLine(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,
     for (;;) {
         Dotted_Len++;
         //Painted dotted line, 2 point is really virtual
-        if (Line_Style == LINE_STYLE_DOTTED && Dotted_Len % 2 == 0) {
+        if (Line_Style == LINE_STYLE_DOTTED && Dotted_Len % (Line_width * 2) == 0) {
             //Debug("LINE_DOTTED\r\n");
             Paint_DrawPoint(Xpoint, Ypoint, IMAGE_BACKGROUND, Line_width, DOT_STYLE_DFT);
             Dotted_Len = 0;
