@@ -199,13 +199,25 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, u
 
     printf("x:%d, y:%d, w:%d, h:%d; %s on %d, at %d+%d with borders: %d\n", x, y, w, h, text, day_of_week, quarter_offset, quarter_length, skip_borders);
 
-    Paint_SelectImage(image_black);
-    Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    bool passed = day_of_week < DAY_WEDNESDAY || (day_of_week == DAY_WEDNESDAY && (quarter_offset + quarter_length) < 6);
+    bool today = day_of_week == DAY_WEDNESDAY;
 
-    if (day_of_week > DAY_WEDNESDAY || (day_of_week == DAY_WEDNESDAY && (quarter_offset + quarter_length) > 6)) {
+    if (today && !passed) {
+        Paint_SelectImage(image_red);
+        Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    } else {
+        Paint_SelectImage(image_black);
+        Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    }
+
+    if (!today && !passed) {
         Paint_SelectImage(image_red);
         Paint_DrawString(x, y - 2, text, font, RED, WHITE);
+    } else if (today && !passed) {
+        Paint_SelectImage(image_red);
+        Paint_DrawString(x, y - 2, text, font, WHITE, WHITE);
     } else {
+        Paint_SelectImage(image_black);
         Paint_DrawString(x, y - 2, text, font, BLACK, WHITE);
     }
 }
