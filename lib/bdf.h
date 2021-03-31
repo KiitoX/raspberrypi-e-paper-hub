@@ -32,6 +32,7 @@ typedef struct {
 
 typedef struct {
     uint8_t size; // point size
+    char *familyName;
     uint8_t ascent; // pixels above the baseline
     uint8_t descent; // pixels below the baseline, these two sum up to size
     uint8_t defaultChar;

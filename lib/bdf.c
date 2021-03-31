@@ -70,6 +70,15 @@ void read_properties(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font) 
 #ifdef BDF_DEBUG
             printf("scan: default = %hhu\n\n", font->defaultChar);
 #endif
+        } else if (starts_with(buffer, "FAMILY_NAME")) {
+#ifdef BDF_DEBUG
+            printf("read: %s", buffer);
+#endif
+            font->familyName = calloc(96, sizeof(*font->familyName));
+            assert(sscanf(buffer, "FAMILY_NAME \"%s\"", font->familyName) == 1);
+#ifdef BDF_DEBUG
+            printf("scan: familyName = '%s'\n\n", font->familyName);
+#endif
         }
     } while (!starts_with(buffer, "ENDPROPERTIES"));
 }
@@ -195,6 +204,7 @@ void bdf_free(bdf_t *font) {
     }
 
     free(font->characters);
+    free(font->familyName);
     free(font);
 }
 
