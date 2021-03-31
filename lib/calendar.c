@@ -202,8 +202,12 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, u
     Paint_SelectImage(image_black);
     Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
-    Paint_SelectImage(image_red);
-    Paint_DrawString(x, y - 2, text, font, RED, WHITE);
+    if (day_of_week < DAY_WEDNESDAY || (day_of_week == DAY_WEDNESDAY && (quarter_offset + quarter_length) < 6)) {
+        Paint_SelectImage(image_red);
+        Paint_DrawString(x, y - 2, text, font, RED, WHITE);
+    } else {
+        Paint_DrawString(x, y - 2, text, font, BLACK, WHITE);
+    }
 }
 
 void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
