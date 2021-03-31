@@ -212,15 +212,15 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, u
 
     if (!today && !passed) {
         Paint_SelectImage(image_red);
-        Paint_DrawString(x, y - 2, text, font, RED, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font, RED, WHITE);
     } else if (today && !passed) {
         Paint_SelectImage(image_red);
-        Paint_DrawString(x, y - 2, text, font, WHITE, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
         Paint_SelectImage(image_black);
-        Paint_DrawString(x, y - 2, text, font, WHITE, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
     } else {
         Paint_SelectImage(image_black);
-        Paint_DrawString(x, y - 2, text, font, BLACK, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font, BLACK, WHITE);
     }
 }
 
