@@ -221,9 +221,9 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     struct tm hour = {0, .tm_hour = 7};
     for (i = 0; i < 14; ++i) {
-        y = 102 + i * 26;
-        strftime(buf, buf_size, "%R", &hour);
-        Paint_DrawString(16, y, buf, font_medium, BLACK, WHITE);
+        y = 104 + i * 26;
+        strftime(buf, buf_size, "%H", &hour);
+        Paint_DrawString(15, y, buf, font_medium, BLACK, WHITE);
         ++hour.tm_hour;
     }
 
