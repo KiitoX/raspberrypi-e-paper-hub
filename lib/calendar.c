@@ -256,7 +256,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     // horizontal hour separators
     for (i = 0; i < 13; ++i) {
         y = 128 + i * 26;
-        Paint_DrawLine(13, y, w - 13, y, WHITE, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
+        Paint_DrawLine(16, y, w - 16, y, WHITE, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     }
 
     // hour labels
