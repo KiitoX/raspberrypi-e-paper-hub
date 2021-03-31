@@ -197,11 +197,10 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, u
     uint16_t h = quarter_length * 11 + ((quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1));
 
     printf("x:%d, y:%d, w:%d, h:%d\n", x, y, w, h);
-    Paint_SelectImage(image_black);
-    Paint_DrawRectangle(x, y, x + w, y + h, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-
     Paint_SelectImage(image_red);
-    Paint_DrawString(x, y, text, font, RED, WHITE);
+    Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+    Paint_DrawString(x, y, text, font, WHITE, WHITE);
 }
 
 void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
@@ -291,6 +290,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     draw_event(image_black, image_red, "length", font_small, 0, 3, DAY_SUNDAY);
     draw_event(image_black, image_red, "of", font_small, 3, 2, DAY_SUNDAY);
+    draw_event(image_black, image_red, "more stuff", font_small, 3, 2, DAY_TUESDAY);
     draw_event(image_black, image_red, "events", font_small, 5, 1, DAY_TUESDAY);
     for (int j = 0; j < 12; ++j) {
         draw_event(image_black, image_red, "loop test", font_small, j, 1, DAY_WEDNESDAY);
