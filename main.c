@@ -59,6 +59,7 @@ int main() {
      * Main
      */
 
+#ifdef GAPI_TEST
     size_t i;
     json_t *j_resp = NULL, *j_elem;
 
@@ -127,6 +128,7 @@ int main() {
     }
     free_week_boundaries(boundary);
     free(time_zone);
+#endif
 
     draw_calendar(image_black, image_red);
 
@@ -206,7 +208,9 @@ int main() {
     DEV_Module_Exit();
 #endif
 
+#ifdef GAPI_TEST
     close_session();
+#endif
 
     bdf_free(font);
     return 0;
