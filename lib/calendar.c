@@ -212,7 +212,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         Paint_DrawLine(x, 74, x, h - 13, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
 
         Paint_DrawString(x, 75, DAY_NAME(i), font2x, BLACK, WHITE);
-        Paint_DrawString(x + 38, 64, "32", font3x, BLACK, WHITE);
+        Paint_DrawString(x + 38, 64, " 2", font3x, BLACK, WHITE);
     }
 
     Paint_DrawString(20, 20, "Calendar", font3x, BLACK, WHITE);
