@@ -200,6 +200,10 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     bdf_t *font3x = bdf_read(file, 3);
     bdf_t *font2x = bdf_read(file, 2);
 
+    // Clear images
+    Paint_SelectImage(image_red);
+    Paint_Clear(WHITE);
+
     // Draw black image
     Paint_SelectImage(image_black);
     Paint_Clear(WHITE);
@@ -214,6 +218,10 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     Paint_DrawRectangle(13, 13, w - 13, h - 13, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
     Paint_DrawLine(13, 101, w - 13, 101, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
+    struct tm today = {0};
+    time_t now = time(NULL);
+    localtime_r(&now, &today);
+
     for (i = 0; i < 7; ++i) {
         x = 61 + i * 82;
         Paint_DrawLine(x, 74, x, h - 13, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
@@ -222,17 +230,24 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         day.tm_mday += i;
         mktime(&day);
 
+        if (day.tm_mday == today.tm_mday) {
+            Paint_SelectImage(image_red);
+        }
+
         strftime(buf, 31, "%a", &day);
         Paint_DrawString(x, 75, buf, font2x, BLACK, WHITE);
         strftime(buf, 31, "%d", &day);
         Paint_DrawString(x + 38, 64, buf, font3x, BLACK, WHITE);
+
+        if (day.tm_mday == today.tm_mday) {
+            Paint_SelectImage(image_black);
+        }
     }
 
     Paint_DrawString(20, 20, "Calendar", font3x, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
-    Paint_Clear(WHITE);
 
     bdf_free(font3x);
     bdf_free(font2x);
