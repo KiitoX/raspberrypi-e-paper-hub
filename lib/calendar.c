@@ -222,9 +222,9 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         day.tm_mday += i;
         mktime(&day);
 
+        strftime(buf, 31, "%b", &day);
+        Paint_DrawString(x, 75, buf, font2x, BLACK, WHITE);
         strftime(buf, 31, "%d", &day);
-        Paint_DrawString(x, 75, DAY_NAME(i), font2x, BLACK, WHITE);
-        strftime(buf, 31, "%e", &day);
         Paint_DrawString(x + 38, 64, buf, font3x, BLACK, WHITE);
     }
 
