@@ -332,7 +332,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     free_week_boundaries(boundary);
 
     EPD_0583_1_Display(image_black, image_red);
-    DEV_Delay_ms(30000);
+    DEV_Delay_ms(3000);
 }
 
 #endif
