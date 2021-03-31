@@ -215,7 +215,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     // horizontal hour separators
     for (i = 0; i < 13; ++i) {
-        y = 127 + i * 26;
+        y = 128 + i * 26;
         Paint_DrawLine(13, y, w - 13, y, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
     }
@@ -223,14 +223,15 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     // hour labels
     struct tm hour = {0, .tm_hour = 7};
     for (i = 0; i < 14; ++i) {
-        y = 102 + i * 26;
+        y = 103 + i * 26;
         strftime(buf, buf_size, "%H", &hour);
         Paint_DrawString(15, y, buf, font_medium, BLACK, WHITE);
+        Paint_DrawString(25, y, "00", font_small, BLACK, WHITE);
         ++hour.tm_hour;
     }
 
     // borders
-    Paint_DrawRectangle(13, 13, w - 13, h - 13, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
+    Paint_DrawRectangle(13, 13, w - 12, h - 12, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
     Paint_DrawLine(13, 99, w - 13, 99, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
     struct tm today = {0};
@@ -265,7 +266,6 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     }
 
     strftime(buf, buf_size, "Calendar - %d %B %Y", &today);
-    Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
