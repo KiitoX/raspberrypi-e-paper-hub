@@ -149,7 +149,8 @@ int main() {
     }
 
     bdf_print_bitmap(cozette, bdf_get_bitmap(cozette, 1033));
-#endif
+
+#ifdef EPD_TEST
 
     bdf_t *fonts[] = {cozette, lode_sans, kakwafont, scientifica, gohufont, siji, ctrld_13, ctrld_16};
     for (int i = 0; i < 8; ++i) {
@@ -171,6 +172,10 @@ int main() {
         DEV_Delay_ms(30000);
 
     }
+
+#endif
+
+#endif
 
     draw_calendar(image_black, image_red);
 
