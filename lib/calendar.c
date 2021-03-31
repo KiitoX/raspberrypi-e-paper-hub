@@ -249,9 +249,9 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     int x, y, i;
 
     // border
-    Paint_DrawRectangle(11, 11, w - 10, h - 10, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
+    Paint_DrawRectangle(10, 10, w - 10, h - 10, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
     // Black Background
-    Paint_DrawRectangle(17, 100, w - 16, h - 15, BLACK, DOT_PIXEL_3X3, DRAW_FILL_FULL);
+    Paint_DrawRectangle(16, 100, w - 16, h - 15, BLACK, DOT_PIXEL_3X3, DRAW_FILL_FULL);
 
     // horizontal hour separators
     for (i = 0; i < 13; ++i) {
@@ -302,7 +302,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     }
 
     // white horizontal separator
-    Paint_DrawLine(15, 102, w - 14, 102, WHITE, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
+    Paint_DrawLine(14, 101, w - 14, 101, WHITE, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
 
     strftime(buf, buf_size, "Calendar - %d %B %Y", &today);
     Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
