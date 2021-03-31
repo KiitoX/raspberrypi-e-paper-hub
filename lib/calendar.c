@@ -230,7 +230,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     // borders
     Paint_DrawRectangle(13, 13, w - 13, h - 13, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
-    Paint_DrawLine(13, 100, w - 13, 101, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
+    Paint_DrawLine(13, 99, w - 13, 99, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
     struct tm today = {0};
     time_t now = time(NULL);
@@ -253,7 +253,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         Paint_DrawString(x + 2, 72, buf, font_medium, BLACK, WHITE);
 
         strftime(buf, buf_size, "%d", &day);
-        Paint_DrawString(x + 42, 62, buf, font_large_mono, BLACK, WHITE);
+        Paint_DrawString(x + 48, 68, buf, font_large_mono, BLACK, WHITE);
 
         if (day.tm_mday == today.tm_mday) {
             Paint_SelectImage(image_black);
@@ -265,6 +265,8 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     // Draw red picture
     Paint_SelectImage(image_red);
+
+    Paint_DrawLine(100, 0, 100, h, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
     bdf_free(font_large);
     bdf_free(font_large_mono);
