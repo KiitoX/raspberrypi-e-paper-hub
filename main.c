@@ -27,9 +27,15 @@ int main() {
     signal(SIGINT, signal_handler);
 #endif
 
-    char *file = "./fonts/cozette.bdf";
-
-    bdf_t *font = bdf_read(file, 1);
+    int scale = 1;
+    bdf_t *cozette = bdf_read("./fonts/cozette.bdf", scale);
+    bdf_t *lode_sans = bdf_read("./fonts/LodeSans-15.bdf", scale);
+    bdf_t *kakwafont = bdf_read("./fonts/kakwafont-12-n.bdf", scale);
+    bdf_t *scientifica = bdf_read("./fonts/scientifica-11.bdf", scale);
+    bdf_t *gohufont = bdf_read("./fonts/gohufont-uni-14.bdf", scale);
+    bdf_t *siji = bdf_read("./fonts/siji.bdf", scale);
+    bdf_t *ctrld_13 = bdf_read("./fonts/ctrld-fixed-13r.bdf", scale);
+    bdf_t *ctrld_16 = bdf_read("./fonts/ctrld-fixed-16r.bdf", scale);
 
 #ifdef GAPI_TEST
     create_session();
@@ -132,34 +138,43 @@ int main() {
     free(time_zone);
 #endif
 
-    draw_calendar(image_black, image_red);
-
 #ifdef BDF_TEST
     puts("");
-    printf("font: %ld characters, %hhd pt, bounds: %hhu %hhu %hhd %hhd\n", font->numChars, font->size, font->width, font->height, font->offsetX, font->offsetY);
+    printf("cozette: %ld characters, %hhd pt, bounds: %hhu %hhu %hhd %hhd\n", cozette->numChars, cozette->size, cozette->width, cozette->height, cozette->offsetX, cozette->offsetY);
     puts("");
 
     for (int i = 0; i < 250; ++i) {
-        bdf_print_bitmap(font, &font->characters[i]);
+        bdf_print_bitmap(cozette, &cozette->characters[i]);
         puts("");
     }
 
-    bdf_print_bitmap(font, bdf_get_bitmap(font, 1033));
+    bdf_print_bitmap(cozette, bdf_get_bitmap(cozette, 1033));
 #endif
 
+    bdf_t *fonts[] = {cozette, lode_sans, kakwafont, scientifica, gohufont, siji, ctrld_13, ctrld_16};
+    for (int i = 0; i < 8; ++i) {
+        bdf_t *font = fonts[i];
+
+        // Draw black image
+        Paint_SelectImage(image_black);
+        Paint_Clear(WHITE);
+
+        printf("Showing %s\n", font->familyName);
+
+        Paint_DrawCharmap(10, 10, font, 0, BLACK, WHITE);
+
+        // Draw red picture
+        Paint_SelectImage(image_red);
+        Paint_Clear(WHITE);
+
+        EPD_0583_1_Display(image_black, image_red);
+        DEV_Delay_ms(30000);
+
+    }
+
+    draw_calendar(image_black, image_red);
+
 #ifdef EPD_TEST
-    // Draw black image
-    Paint_SelectImage(image_black);
-    Paint_Clear(WHITE);
-
-    Paint_DrawCharmap(10, 10, font, 0, BLACK, WHITE);
-
-    // Draw red picture
-    Paint_SelectImage(image_red);
-    Paint_Clear(WHITE);
-
-    EPD_0583_1_Display(image_black, image_red);
-    DEV_Delay_ms(30000);
 
     // Draw black image
     Paint_SelectImage(image_black);
@@ -175,8 +190,8 @@ int main() {
     Paint_DrawLine(100, 200, 100, 300, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     Paint_DrawLine(50, 250, 150, 250, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
-    Paint_DrawString(350, 10, "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ", font, BLACK, WHITE);
-    Paint_DrawString(10, 335, "testing the black font", font, BLACK, WHITE);
+    Paint_DrawString(350, 10, "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ", cozette, BLACK, WHITE);
+    Paint_DrawString(10, 335, "testing the black cozette", cozette, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
@@ -188,8 +203,8 @@ int main() {
     Paint_DrawCircle(100, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
     Paint_DrawCircle(250, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
-    Paint_DrawString(10, 310, "hello! e-paper", font, WHITE, RED);
-    Paint_DrawString(10, 360, "0123456789", font, RED, WHITE);
+    Paint_DrawString(10, 310, "hello! e-paper", cozette, WHITE, RED);
+    Paint_DrawString(10, 360, "0123456789", cozette, RED, WHITE);
 
     EPD_0583_1_Display(image_black, image_red);
     DEV_Delay_ms(3000);
@@ -214,6 +229,14 @@ int main() {
     close_session();
 #endif
 
-    bdf_free(font);
+    bdf_free(cozette);
+    bdf_free(lode_sans);
+    bdf_free(kakwafont);
+    bdf_free(scientifica);
+    bdf_free(gohufont);
+    bdf_free(siji);
+    bdf_free(ctrld_13);
+    bdf_free(ctrld_16);
+
     return 0;
 }

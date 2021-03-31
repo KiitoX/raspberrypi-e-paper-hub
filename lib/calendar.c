@@ -196,9 +196,9 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     t_week_boundary boundary = get_week_boundaries(NULL, DAY_SUNDAY);
     char buf[32] = {0};
 
-    char *file = "./fonts/cozette.bdf";
-    bdf_t *font3x = bdf_read(file, 3);
-    bdf_t *font2x = bdf_read(file, 2);
+    bdf_t *font_large = bdf_read("./fonts/LodeSans-15.bdf", 2);
+    bdf_t *font_medium = bdf_read("./fonts/cozette.bdf", 2);
+    // bdf_t *font_small = bdf_read("", 1);
 
     // Clear images
     Paint_SelectImage(image_red);
@@ -235,22 +235,22 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         }
 
         strftime(buf, 31, "%a", &day);
-        Paint_DrawString(x, 75, buf, font2x, BLACK, WHITE);
+        Paint_DrawString(x, 75, buf, font_medium, BLACK, WHITE);
         strftime(buf, 31, "%d", &day);
-        Paint_DrawString(x + 38, 65, buf, font3x, BLACK, WHITE);
+        Paint_DrawString(x + 38, 65, buf, font_large, BLACK, WHITE);
 
         if (day.tm_mday == today.tm_mday) {
             Paint_SelectImage(image_black);
         }
     }
 
-    Paint_DrawString(20, 20, "Calendar", font3x, BLACK, WHITE);
+    Paint_DrawString(20, 20, "Calendar", font_large, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
 
-    bdf_free(font3x);
-    bdf_free(font2x);
+    bdf_free(font_large);
+    bdf_free(font_medium);
 
     free_week_boundaries(boundary);
 
