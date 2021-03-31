@@ -227,7 +227,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         y = 103 + i * 26;
         strftime(buf, buf_size, "%H", &hour);
         Paint_DrawString(15, y, buf, font_medium, BLACK, WHITE);
-        Paint_DrawString(43, y, "00", font_small, BLACK, WHITE);
+        Paint_DrawString(42, y + 4, "00", font_small, BLACK, WHITE);
         ++hour.tm_hour;
     }
 
@@ -267,12 +267,13 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     }
 
     strftime(buf, buf_size, "Calendar - %d %B %Y", &today);
+    Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
-
+    /*
     Paint_DrawLine(100, 0, 100, h, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawLine(0, 300, w, 300, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
+    Paint_DrawLine(0, 300, w, 300, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);*/
 
     bdf_free(font_large);
     bdf_free(font_large_mono);
