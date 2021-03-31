@@ -75,7 +75,7 @@ void read_properties(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font) 
             printf("read: %s", buffer);
 #endif
             font->familyName = calloc(96, sizeof(*font->familyName));
-            assert(sscanf(buffer, "FAMILY_NAME \"%s\"", font->familyName) == 1);
+            assert(sscanf(buffer, "FAMILY_NAME \"%[^\"]\"", font->familyName) == 1);
 #ifdef BDF_DEBUG
             printf("scan: familyName = '%s'\n\n", font->familyName);
 #endif
