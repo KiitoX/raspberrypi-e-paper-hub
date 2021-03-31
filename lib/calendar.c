@@ -198,6 +198,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     char buf[65] = {0};
 
     bdf_t *font_large = bdf_read("./fonts/LodeSans-15.bdf", 2);
+    bdf_t *font_large_mono = bdf_read("./fonts/LodeSansMono-15.bdf", 2);
     bdf_t *font_medium = bdf_read("./fonts/cozette.bdf", 2);
     bdf_t *font_small = bdf_read("./fonts/scientifica-11.bdf", 1);
     bdf_t *font_icons = bdf_read("./fonts/siji.bdf", 2);
@@ -214,14 +215,14 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     // horizontal hour separators
     for (i = 0; i < 13; ++i) {
-        y = 128 + i * 26;
+        y = 127 + i * 26;
         Paint_DrawLine(13, y, w - 13, y, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
     }
 
     struct tm hour = {0, .tm_hour = 7};
     for (i = 0; i < 14; ++i) {
-        y = 104 + i * 26;
+        y = 103 + i * 26;
         strftime(buf, buf_size, "%H", &hour);
         Paint_DrawString(15, y, buf, font_medium, BLACK, WHITE);
         ++hour.tm_hour;
@@ -229,7 +230,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     // borders
     Paint_DrawRectangle(13, 13, w - 13, h - 13, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
-    Paint_DrawLine(13, 101, w - 13, 101, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
+    Paint_DrawLine(13, 100, w - 13, 101, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
     struct tm today = {0};
     time_t now = time(NULL);
@@ -249,10 +250,10 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         }
 
         strftime(buf, buf_size, "%a", &day);
-        Paint_DrawString(x, 75, buf, font_medium, BLACK, WHITE);
+        Paint_DrawString(x + 2, 72, buf, font_medium, BLACK, WHITE);
 
         strftime(buf, buf_size, "%d", &day);
-        Paint_DrawString(x + 38, 65, buf, font_large, BLACK, WHITE);
+        Paint_DrawString(x + 42, 62, buf, font_large_mono, BLACK, WHITE);
 
         if (day.tm_mday == today.tm_mday) {
             Paint_SelectImage(image_black);
@@ -266,6 +267,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     Paint_SelectImage(image_red);
 
     bdf_free(font_large);
+    bdf_free(font_large_mono);
     bdf_free(font_medium);
     bdf_free(font_small);
     bdf_free(font_icons);
