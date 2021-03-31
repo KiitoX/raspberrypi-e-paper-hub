@@ -291,6 +291,8 @@ void Paint_DrawLine(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend,
     int Esp = dx + dy;
     char Dotted_Len = 0;
 
+    printf("line %s", (Line_Style == LINE_STYLE_DOTTED) ? "dotted" : "not");
+
     for (;;) {
         Dotted_Len++;
         //Painted dotted line, 2 point is really virtual
