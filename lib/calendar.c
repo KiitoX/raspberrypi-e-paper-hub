@@ -249,7 +249,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     int x, y, i;
 
     // border
-    Paint_DrawRectangle(13, 13, w - 12, h - 12, BLACK, DOT_PIXEL_2X2, DRAW_FILL_EMPTY);
+    Paint_DrawRectangle(11, 11, w - 10, h - 10, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
     // Black Background
     Paint_DrawRectangle(16, 100, w - 16, h - 15, BLACK, DOT_PIXEL_3X3, DRAW_FILL_FULL);
 
