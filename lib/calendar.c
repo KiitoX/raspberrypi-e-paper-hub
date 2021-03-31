@@ -200,10 +200,6 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     bdf_t *font3x = bdf_read(file, 3);
     bdf_t *font2x = bdf_read(file, 2);
 
-    // Clear images
-    Paint_SelectImage(image_red);
-    Paint_Clear(WHITE);
-
     // Draw black image
     Paint_SelectImage(image_black);
     Paint_Clear(WHITE);
@@ -237,7 +233,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         strftime(buf, 31, "%a", &day);
         Paint_DrawString(x, 75, buf, font2x, BLACK, WHITE);
         strftime(buf, 31, "%d", &day);
-        Paint_DrawString(x + 38, 64, buf, font3x, BLACK, WHITE);
+        Paint_DrawString(x + 38, 65, buf, font3x, BLACK, WHITE);
 
         if (day.tm_mday == today.tm_mday) {
             Paint_SelectImage(image_black);
@@ -248,6 +244,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     // Draw red picture
     Paint_SelectImage(image_red);
+    Paint_Clear(WHITE);
 
     bdf_free(font3x);
     bdf_free(font2x);
