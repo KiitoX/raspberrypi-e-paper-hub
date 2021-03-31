@@ -205,7 +205,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         x = 61 + i * 82;
         Paint_DrawLine(x, 74, x, h - 12, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
 
-        Paint_DrawString(x + 2, 74, DAY_NAME[i], font2x, BLACK, WHITE);
+        Paint_DrawString(x + 2, 74, DAY_NAME(i), font2x, BLACK, WHITE);
     }
 
     for (i = 0; i < 13; ++i) {

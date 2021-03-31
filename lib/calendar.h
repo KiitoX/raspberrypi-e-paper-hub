@@ -24,7 +24,7 @@ void close_session();
 #define DAY_FRIDAY 5
 #define DAY_SATURDAY 6
 
-#define DAY_NAME ((char []){"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"})
+#define DAY_NAME(i) (i == 0 ? "Sun" : (i == 1 ? "Mon" : (i == 2 ? "Tue" : (i == 3 ? "Wed" : (i == 4 ? "Thu" : (i == 5 ? "Fri" : "Sat"))))))
 
 typedef struct {
     char *start, *end;

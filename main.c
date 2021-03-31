@@ -128,6 +128,8 @@ int main() {
     free_week_boundaries(boundary);
     free(time_zone);
 
+    draw_calendar(image_black, image_red);
+
 #ifdef BDF_TEST
     puts("");
     printf("font: %ld characters, %hhd pt, bounds: %hhu %hhu %hhd %hhd\n", font->numChars, font->size, font->width, font->height, font->offsetX, font->offsetY);
