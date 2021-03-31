@@ -12,9 +12,9 @@ pwd
 
 set -o xtrace
 
-cmake -DCMAKE_BUILD_TYPE="Debug" -G Ninja ..
+cmake -DCMAKE_BUILD_TYPE="Debug" -G Ninja .. || exit
 
-ninja
+ninja || exit
 
 cd ..
 sudo build/epaper
