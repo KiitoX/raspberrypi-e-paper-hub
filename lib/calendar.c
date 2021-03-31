@@ -249,9 +249,11 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     int x, y, i;
 
     // border
-    Paint_DrawRectangle(11, 11, w - 10, h - 10, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
+    Paint_DrawRectangle(10, 10, w - 10, h - 10, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
     // Black Background
     Paint_DrawRectangle(16, 100, w - 16, h - 15, BLACK, DOT_PIXEL_3X3, DRAW_FILL_FULL);
+    // white horizontal separator
+    Paint_DrawLine(14, 104, w - 14, 104, WHITE, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
 
     // horizontal hour separators
     for (i = 0; i < 13; ++i) {
