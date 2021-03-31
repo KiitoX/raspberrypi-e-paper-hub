@@ -194,11 +194,13 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     int w = EPD_0583_1_WIDTH, h = EPD_0583_1_HEIGHT;
 
     t_week_boundary boundary = get_week_boundaries(NULL, DAY_SUNDAY);
-    char buf[32] = {0};
+    size_t buf_size = 64;
+    char buf[65] = {0};
 
     bdf_t *font_large = bdf_read("./fonts/LodeSans-15.bdf", 2);
     bdf_t *font_medium = bdf_read("./fonts/cozette.bdf", 2);
-    // bdf_t *font_small = bdf_read("", 1);
+    bdf_t *font_small = bdf_read("./fonts/scientifica-11.bdf", 1);
+    bdf_t *font_icons = bdf_read("./fonts/siji.bdf", 2);
 
     // Clear images
     Paint_SelectImage(image_red);
@@ -210,11 +212,19 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     int x, y, i;
 
+    struct tm time = {0, .tm_hour = 7};
+
+    // horizontal hour separators
     for (i = 0; i < 13; ++i) {
         y = 128 + i * 26;
         Paint_DrawLine(13, y, w - 13, y, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
+
+        strftime(buf, buf_size, "%R", &time);
+        Paint_DrawString(16, y - 23, buf, font_medium, BLACK, WHITE);
+        ++time.tm_hour;
     }
 
+    // borders
     Paint_DrawRectangle(13, 13, w - 13, h - 13, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
     Paint_DrawLine(13, 101, w - 13, 101, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
@@ -222,6 +232,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     time_t now = time(NULL);
     localtime_r(&now, &today);
 
+    // vertical day separators
     for (i = 0; i < 7; ++i) {
         x = 61 + i * 82;
         Paint_DrawLine(x, 74, x, h - 13, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
@@ -234,9 +245,10 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
             Paint_SelectImage(image_red);
         }
 
-        strftime(buf, 31, "%a", &day);
+        strftime(buf, buf_size, "%a", &day);
         Paint_DrawString(x, 75, buf, font_medium, BLACK, WHITE);
-        strftime(buf, 31, "%d", &day);
+
+        strftime(buf, buf_size, "%d", &day);
         Paint_DrawString(x + 38, 65, buf, font_large, BLACK, WHITE);
 
         if (day.tm_mday == today.tm_mday) {
@@ -244,13 +256,16 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         }
     }
 
-    Paint_DrawString(20, 20, "Calendar", font_large, BLACK, WHITE);
+    strftime(buf, buf_size, "Calendar - %d %B %Y", &today);
+    Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
 
     bdf_free(font_large);
     bdf_free(font_medium);
+    bdf_free(font_small);
+    bdf_free(font_icons);
 
     free_week_boundaries(boundary);
 
