@@ -194,7 +194,7 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, u
     uint16_t x = 67 + day_of_week * 82;
     uint16_t w = 70;
     uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
-    uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1);
+    uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1) : ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3);
     uint16_t h = quarter_length * 11 + skip_borders;
 
     printf("x:%d, y:%d, w:%d, h:%d; %s on %d, at %d+%d with borders: %d\n", x, y, w, h, text, day_of_week, quarter_offset, quarter_length, skip_borders);
