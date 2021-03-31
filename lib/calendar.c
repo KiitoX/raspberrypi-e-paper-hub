@@ -198,10 +198,12 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, u
     uint16_t h = quarter_length * 11 + skip_borders;
 
     printf("x:%d, y:%d, w:%d, h:%d; %s on %d, at %d+%d with borders: %d\n", x, y, w, h, text, day_of_week, quarter_offset, quarter_length, skip_borders);
-    Paint_SelectImage(image_red);
-    Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
-    Paint_DrawString(x, y - 2, text, font, WHITE, WHITE);
+    Paint_SelectImage(image_black);
+    Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+
+    Paint_SelectImage(image_red);
+    Paint_DrawString(x, y - 2, text, font, RED, WHITE);
 }
 
 void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
@@ -228,6 +230,11 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     int x, y, i;
 
+    // border
+    Paint_DrawRectangle(13, 13, w - 12, h - 12, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
+    // Black Background
+    Paint_DrawRectangle(16, 100, w - 16, h - 15, BLACK, DOT_PIXEL_3X3, DRAW_FILL_FULL);
+
     // horizontal hour separators
     for (i = 0; i < 13; ++i) {
         y = 128 + i * 26;
@@ -239,15 +246,10 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     for (i = 0; i < 14; ++i) {
         y = 103 + i * 26;
         strftime(buf, buf_size, "%H", &hour);
-        Paint_DrawString(15, y, buf, font_medium, BLACK, WHITE);
-        Paint_DrawString(42, y + 2, "00", font_small, BLACK, WHITE);
+        Paint_DrawString(15, y, buf, font_medium, WHITE, WHITE);
+        Paint_DrawString(42, y + 2, "00", font_small, WHITE, WHITE);
         ++hour.tm_hour;
     }
-
-    // border
-    Paint_DrawRectangle(13, 13, w - 12, h - 12, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
-    // horizontal divide
-    Paint_DrawLine(13, 100, w - 13, 100, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
     struct tm today = {0};
     time_t now = time(NULL);
@@ -256,7 +258,8 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     // vertical day separators
     for (i = 0; i < 7; ++i) {
         x = 61 + i * 82;
-        Paint_DrawLine(x, 74, x, h - 13, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
+        Paint_DrawLine(x, 74, x, x + 30, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
+        Paint_DrawLine(x + 30, 74, x, h - 13, WHITE, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
 
         struct tm day = *boundary.tm_start;
         day.tm_mday += i;
