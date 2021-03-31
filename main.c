@@ -31,7 +31,9 @@ int main() {
 
     bdf_t *font = bdf_read(file, 1);
 
+#ifdef GAPI_TEST
     create_session();
+#endif
 
 #ifdef EPD
     assert(DEV_Module_Init() == 0);
