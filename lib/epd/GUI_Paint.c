@@ -761,6 +761,31 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
     }
 }
 
+void Paint_DrawCharmap(UWORD xPos, UWORD yPos, bdf_t *font, size_t offset, UWORD color_fg, UWORD color_bg) {
+    if (xPos > Paint.Width || yPos > Paint.Height) {
+        Debug("Paint_DrawString: Input exceeds display boundary\n");
+        return;
+    }
+
+    UWORD x = xPos, y = yPos;
+
+    for (size_t i = offset; i < font->numChars; ++i) {
+        // move to new line at x boundary
+        if ((x + font->width * font->scale) > Paint.Width) {
+            x = xPos;
+            y += font->height * font->scale;
+        }
+
+        // stop at y boundary
+        if ((y + font->height * font->scale) > Paint.Height) {
+            Debug("Paint_DrawCharmap: Reached display limit at i = %ld\n", i);
+            return;
+        }
+
+        x += Paint_DrawChar(x, y, font->characters[i].encoding, font, color_fg, color_bg);
+    }
+}
+
 #endif
 
 /******************************************************************************

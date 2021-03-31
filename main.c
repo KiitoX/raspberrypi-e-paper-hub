@@ -146,6 +146,19 @@ int main() {
     Paint_SelectImage(image_black);
     Paint_Clear(WHITE);
 
+    Paint_DrawCharmap(10, 10, font, 0, BLACK, WHITE);
+
+    // Draw red picture
+    Paint_SelectImage(image_red);
+    Paint_Clear(WHITE);
+
+    EPD_0583_1_Display(image_black, image_red);
+    DEV_Delay_ms(30000);
+
+    // Draw black image
+    Paint_SelectImage(image_black);
+    Paint_Clear(WHITE);
+
     Paint_DrawPoint(25, 50, BLACK, DOT_PIXEL_1X1, DOT_STYLE_DFT);
     Paint_DrawPoint(25, 70, BLACK, DOT_PIXEL_2X2, DOT_STYLE_DFT);
     Paint_DrawPoint(25, 90, BLACK, DOT_PIXEL_3X3, DOT_STYLE_DFT);
@@ -156,6 +169,7 @@ int main() {
     Paint_DrawLine(100, 200, 100, 300, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     Paint_DrawLine(50, 250, 150, 250, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
+    Paint_DrawString(350, 10, "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ", font, BLACK, WHITE);
     Paint_DrawString(10, 335, "testing the black font", font, BLACK, WHITE);
 
     // Draw red picture
@@ -168,12 +182,11 @@ int main() {
     Paint_DrawCircle(100, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
     Paint_DrawCircle(250, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
-
     Paint_DrawString(10, 310, "hello! e-paper", font, WHITE, RED);
     Paint_DrawString(10, 360, "0123456789", font, RED, WHITE);
 
     EPD_0583_1_Display(image_black, image_red);
-    DEV_Delay_ms(30000);
+    DEV_Delay_ms(3000);
 #endif
 
     /**
