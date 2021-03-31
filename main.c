@@ -3,6 +3,7 @@
 #include <locale.h>
 
 #include "lib/bdf.h"
+#include "lib/calendar.h"
 
 #ifdef EPD
 #include "lib/epd/ER-EPD0583-1.h"
@@ -26,9 +27,11 @@ int main() {
     signal(SIGINT, signal_handler);
 #endif
 
-    char *file = "./fonts/cozette.bdf";
+    char *file = "/home/emma/Programming/CLionProjects/epaper/fonts/cozette.bdf";
 
     bdf_t *font = bdf_read(file, 1);
+
+    create_session();
 
 #ifdef EPD
     assert(DEV_Module_Init() == 0);
@@ -55,6 +58,75 @@ int main() {
     /**
      * Main
      */
+
+    size_t i;
+    json_t *j_resp = NULL, *j_elem;
+
+    j_resp = api_request("https://www.googleapis.com/calendar/v3/users/me/calendarList");
+    if (j_resp != NULL) {
+        if (json_is_array(json_object_get(j_resp, "items"))) {
+            json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
+                // all of the config stuff contained herein is sent again with events.list
+                if (json_is_string(json_object_get(j_elem, "id")) &&
+                    json_is_string(json_object_get(j_elem, "summary"))) {
+                    printf("%s: '%s'\n",
+                           json_string_value(json_object_get(j_elem, "id")),
+                           json_string_value(json_object_get(j_elem, "summary")));
+                    // TODO add to a list or something
+                }
+            }
+        }
+        json_decref(j_resp);
+    }
+
+    const char *settingsListGet = "https://www.googleapis.com/calendar/v3/users/me/settings";
+    char *time_zone = NULL;
+    int week_start = DAY_SUNDAY;
+    j_resp = api_request(settingsListGet);
+    if (j_resp != NULL) {
+        if (json_is_array(json_object_get(j_resp, "items"))) {
+            json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
+                if (json_is_string(json_object_get(j_elem, "id")) &&
+                    json_is_string(json_object_get(j_elem, "value"))) {
+                    if (0 == strcmp(json_string_value(json_object_get(j_elem, "id")), "timezone")) {
+                        const char *tzBuf = json_string_value(json_object_get(j_elem, "value"));
+                        time_zone = calloc(strlen(tzBuf) + 1, sizeof(*time_zone));
+                        strcpy(time_zone, tzBuf);
+                    } else if (0 == strcmp(json_string_value(json_object_get(j_elem, "value")), "weekStart")) {
+                        const char *weekBuf = json_string_value(json_object_get(j_elem, "value"));
+                        // week start: "0": Sunday, "1": Monday, "6": Saturday
+                        errno = 0;
+                        week_start = (int)strtol(weekBuf, NULL, 10);
+                        if (errno != 0) {
+                            printf("Failed to convert %s to integer.\n", weekBuf);
+                        }
+                    }
+                }
+            }
+        }
+        json_decref(j_resp);
+    }
+
+    // this is paginated, we will want to go through until we're done, though also limit it to &current_week
+    const char *eventsListGet = "https://www.googleapis.com/calendar/v3/calendars/manuel.manu.delfin@gmail.com/events";
+
+    t_week_boundary boundary = get_week_boundaries(time_zone, week_start);
+
+    struct _u_request req = init_api_request(eventsListGet);
+    ulfius_set_request_properties(&req,
+                                  U_OPT_URL_PARAMETER, "singleEvents", "true", // expand recurring events
+                                  U_OPT_URL_PARAMETER, "orderBy", "startTime",
+                                  U_OPT_URL_PARAMETER, "timeMin", boundary.start,
+                                  U_OPT_URL_PARAMETER, "timeMax", boundary.end,
+                                  U_OPT_NONE);
+    j_resp = get_api_response(req);
+    if (j_resp != NULL) {
+        JSON_DEBUG(j_resp);
+
+        json_decref(j_resp);
+    }
+    free_week_boundaries(boundary);
+    free(time_zone);
 
 #ifdef BDF_TEST
     puts("");
@@ -118,6 +190,8 @@ int main() {
 
     DEV_Module_Exit();
 #endif
+
+    close_session();
 
     bdf_free(font);
     return 0;
