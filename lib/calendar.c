@@ -183,3 +183,47 @@ void free_week_boundaries(t_week_boundary boundary) {
     free(boundary.start);
     free(boundary.end);
 }
+
+#ifdef EPD
+
+void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
+    int w = EPD_0583_1_WIDTH, h = EPD_0583_1_HEIGHT;
+
+    char *file = "./fonts/cozette.bdf";
+    bdf_t *font3x = bdf_read(file, 3);
+    bdf_t *font2x = bdf_read(file, 2);
+
+    // Draw black image
+    Paint_SelectImage(image_black);
+    Paint_Clear(WHITE);
+
+    Paint_DrawRectangle(12, 12, w - 12, h - 12, BLACK, DOT_PIXEL_4X4, DRAW_FILL_EMPTY);
+    Paint_DrawLine(12, 100, w - 12, 100, BLACK, DOT_PIXEL_4X4, LINE_STYLE_SOLID);
+
+    int x, y, i;
+    for (i = 0; i < 7; ++i) {
+        x = 61 + i * 82;
+        Paint_DrawLine(x, 74, x, h - 12, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
+
+        Paint_DrawString(x + 2, 74, DAY_NAME[i], font2x, BLACK, WHITE);
+    }
+
+    for (i = 0; i < 13; ++i) {
+        y = 128 + i * 26;
+        Paint_DrawLine(12, y, x - 12, y, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
+    }
+
+    Paint_DrawString(20, 20, "Calendar", font3x, BLACK, WHITE);
+
+    // Draw red picture
+    Paint_SelectImage(image_red);
+    Paint_Clear(WHITE);
+
+    bdf_free(font3x);
+    bdf_free(font2x);
+
+    EPD_0583_1_Display(image_black, image_red);
+    DEV_Delay_ms(30000);
+}
+
+#endif

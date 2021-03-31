@@ -141,7 +141,7 @@ int main() {
     bdf_print_bitmap(font, bdf_get_bitmap(font, 1033));
 #endif
 
-#ifdef EPD
+#ifdef EPD_TEST
     // Draw black image
     Paint_SelectImage(image_black);
     Paint_Clear(WHITE);
