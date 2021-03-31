@@ -212,16 +212,16 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     int x, y, i;
 
-    struct tm time = {0, .tm_hour = 7};
+    struct tm hour = {0, .tm_hour = 7};
 
     // horizontal hour separators
     for (i = 0; i < 13; ++i) {
         y = 128 + i * 26;
         Paint_DrawLine(13, y, w - 13, y, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
-        strftime(buf, buf_size, "%R", &time);
+        strftime(buf, buf_size, "%R", &hour);
         Paint_DrawString(16, y - 23, buf, font_medium, BLACK, WHITE);
-        ++time.tm_hour;
+        ++hour.tm_hour;
     }
 
     // borders
