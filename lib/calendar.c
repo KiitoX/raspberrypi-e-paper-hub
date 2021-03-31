@@ -192,7 +192,7 @@ void free_week_boundaries(t_week_boundary boundary) {
 
 void draw_event(char *text, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
     uint16_t x = 67 + day_of_week * 82;
-    uint16_t w = 72;
+    uint16_t w = 70;
     uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
     uint16_t h = quarter_length * 11 + ((quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1));
 
@@ -288,6 +288,9 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     draw_event("", 0, 3, DAY_SUNDAY);
     draw_event("", 3, 2, DAY_SUNDAY);
     draw_event("", 5, 1, DAY_TUESDAY);
+    for (int j = 0; j < 12; ++j) {
+        draw_event("", j, 1, DAY_WEDNESDAY);
+    }
     draw_event("", 8, 4, DAY_THURSDAY);
     draw_event("", 12, 1, DAY_THURSDAY);
     draw_event("", 13, 2, DAY_THURSDAY);
