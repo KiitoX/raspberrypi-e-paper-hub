@@ -191,8 +191,8 @@ void free_week_boundaries(t_week_boundary boundary) {
 #ifdef EPD
 
 void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
-    uint16_t x = 67 + day_of_week * 82;
-    uint16_t w = 70;
+    uint16_t x = 65 + day_of_week * 82;
+    uint16_t w = 74;
     uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
     uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1) : ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3);
     uint16_t h = quarter_length * 11 + skip_borders;
