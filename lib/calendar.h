@@ -28,6 +28,7 @@ void close_session();
 
 typedef struct {
     char *start, *end;
+    struct tm *tm_start;
 } t_week_boundary;
 
 t_week_boundary get_week_boundaries(const char *time_zone, int week_start);

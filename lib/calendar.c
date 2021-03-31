@@ -157,6 +157,9 @@ t_week_boundary get_week_boundaries(const char *time_zone, int week_start) {
     start.tm_isdst = -1; // let mktime figure DST
     mktime(&start);
 
+    boundary.tm_start = malloc(sizeof(*boundary.tm_start));
+    memcpy(boundary.tm_start, &start, sizeof(*boundary.tm_start));
+
     end.tm_year = start.tm_year;
     end.tm_mon = start.tm_mon;
     end.tm_mday = start.tm_mday + 7;
@@ -182,12 +185,16 @@ t_week_boundary get_week_boundaries(const char *time_zone, int week_start) {
 void free_week_boundaries(t_week_boundary boundary) {
     free(boundary.start);
     free(boundary.end);
+    free(boundary.tm_start);
 }
 
 #ifdef EPD
 
 void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     int w = EPD_0583_1_WIDTH, h = EPD_0583_1_HEIGHT;
+
+    t_week_boundary boundary = get_week_boundaries(NULL, DAY_SUNDAY);
+    char buf[32] = {0};
 
     char *file = "./fonts/cozette.bdf";
     bdf_t *font3x = bdf_read(file, 3);
@@ -211,8 +218,14 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         x = 61 + i * 82;
         Paint_DrawLine(x, 74, x, h - 13, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
 
+        struct tm day = *boundary.tm_start;
+        day.tm_mday += i;
+        mktime(&day);
+
+        strftime(buf, 31, "%d", &day);
         Paint_DrawString(x, 75, DAY_NAME(i), font2x, BLACK, WHITE);
-        Paint_DrawString(x + 38, 64, " 2", font3x, BLACK, WHITE);
+        strftime(buf, 31, "%e", &day);
+        Paint_DrawString(x + 38, 64, buf, font3x, BLACK, WHITE);
     }
 
     Paint_DrawString(20, 20, "Calendar", font3x, BLACK, WHITE);
@@ -223,6 +236,8 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     bdf_free(font3x);
     bdf_free(font2x);
+
+    free_week_boundaries(boundary);
 
     EPD_0583_1_Display(image_black, image_red);
     DEV_Delay_ms(30000);
