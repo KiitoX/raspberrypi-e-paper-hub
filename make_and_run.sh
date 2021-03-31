@@ -12,8 +12,9 @@ pwd
 
 set -o xtrace
 
-cmake -DCMAKE_BUILD_TYPE=Debug -G Ninja ..
+cmake -DCMAKE_BUILD_TYPE="Debug" -G Ninja ..
 
 ninja
 
-./epaper
+cd ..
+sudo build/epaper

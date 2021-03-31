@@ -27,7 +27,7 @@ int main() {
     signal(SIGINT, signal_handler);
 #endif
 
-    char *file = "/home/emma/Programming/CLionProjects/epaper/fonts/cozette.bdf";
+    char *file = "./fonts/cozette.bdf";
 
     bdf_t *font = bdf_read(file, 1);
 
