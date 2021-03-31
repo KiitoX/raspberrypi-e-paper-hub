@@ -138,8 +138,8 @@ void close_session() {
     i_global_close();
 }
 
-t_week_boundary get_week_boundaries(const char *time_zone, int week_start) {
-    t_week_boundary boundary = {0};
+t_week get_week(const char *time_zone, int week_start) {
+    t_week week = {0};
 
     if (time_zone != NULL) {
         setenv("TZ", time_zone, true);
@@ -147,96 +147,86 @@ t_week_boundary get_week_boundaries(const char *time_zone, int week_start) {
     }
     tzset(); // should be called before localtime_r
 
-    struct tm local, start = {0}, end = {0};
     time_t now = time(NULL);
-    localtime_r(&now, &local);
+    localtime_r(&now, &week.today);
 
-    start.tm_year = local.tm_year;
-    start.tm_mon = local.tm_mon;
-    start.tm_mday = local.tm_mday - local.tm_wday + week_start;
-    start.tm_isdst = -1; // let mktime figure DST
-    mktime(&start);
+    week.start.tm_year = week.today.tm_year;
+    week.start.tm_mon = week.today.tm_mon;
+    week.start.tm_mday = week.today.tm_mday - week.today.tm_wday + week_start;
+    week.start.tm_isdst = -1; // let mktime figure DST
+    mktime(&week.start);
 
-    boundary.tm_start = malloc(sizeof(*boundary.tm_start));
-    memcpy(boundary.tm_start, &start, sizeof(*boundary.tm_start));
-
-    end.tm_year = start.tm_year;
-    end.tm_mon = start.tm_mon;
-    end.tm_mday = start.tm_mday + 7;
-    end.tm_isdst = -1; // let mktime figure DST
-    mktime(&end);
+    week.end.tm_year = week.start.tm_year;
+    week.end.tm_mon = week.start.tm_mon;
+    week.end.tm_mday = week.start.tm_mday + 7;
+    week.end.tm_isdst = -1; // let mktime figure DST
+    mktime(&week.end);
 
     size_t len, len_buf = 32;
     char date_buf[len_buf];
 
-    len = strftime(date_buf, len_buf - 1, "%FT%T%z", &start);
-    boundary.start = calloc(len, sizeof(*boundary.start + 1));
-    strncpy(boundary.start, date_buf, len);
-    printf("Starting at: %s\n", boundary.start);
+    len = strftime(date_buf, len_buf - 1, "%FT%T%z", &week.start);
+    week.start_string = calloc(len, sizeof(*week.start_string + 1));
+    strncpy(week.start_string, date_buf, len);
+    printf("Starting at: %s\n", week.start_string);
 
-    len = strftime(date_buf, len_buf - 1, "%FT%T%z", &end);
-    boundary.end = calloc(len, sizeof(*boundary.end + 1));
-    strncpy(boundary.end, date_buf, len);
-    printf("Ending at: %s\n", boundary.end);
+    len = strftime(date_buf, len_buf - 1, "%FT%T%z", &week.end);
+    week.end_string = calloc(len, sizeof(*week.end_string + 1));
+    strncpy(week.end_string, date_buf, len);
+    printf("Ending at: %s\n", week.end_string);
 
-    return boundary;
+    return week;
 }
 
-void free_week_boundaries(t_week_boundary boundary) {
-    free(boundary.start);
-    free(boundary.end);
-    free(boundary.tm_start);
+void free_week(t_week week) {
+    free(week.start_string);
+    free(week.end_string);
 }
 
 #ifdef EPD
 
-void draw_event(UBYTE *image_black, UBYTE *image_red, char *text, bdf_t *font, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
-    uint16_t x = 65 + day_of_week * 82;
-    uint16_t w = 74;
-    uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
-    uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1) : ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3);
-    uint16_t h = quarter_length * 11 + skip_borders;
+bdf_t *font_large;
+bdf_t *font_large_mono;
+bdf_t *font_medium;
+bdf_t *font_small;
+bdf_t *font_icons;
+t_week week;
 
-    printf("x:%d, y:%d, w:%d, h:%d; %s on %d, at %d+%d with borders: %d\n", x, y, w, h, text, day_of_week, quarter_offset, quarter_length, skip_borders);
+UBYTE *image_black;
+UBYTE *image_red;
 
-    bool passed = day_of_week < DAY_WEDNESDAY || (day_of_week == DAY_WEDNESDAY && (quarter_offset + quarter_length) < 6);
-    bool today = day_of_week == DAY_WEDNESDAY;
+void init_calendar(UBYTE *image_black_, UBYTE *image_red_) {
+    image_black = image_black_;
+    image_red = image_red_;
 
-    if (today && !passed) {
-        Paint_SelectImage(image_red);
-        Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    } else {
-        Paint_SelectImage(image_black);
-        Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
-    }
+    font_large = bdf_read("./fonts/LodeSans-15.bdf", 2);
+    font_large_mono = bdf_read("./fonts/LodeSansMono-15.bdf", 2);
+    font_medium = bdf_read("./fonts/cozette.bdf", 2);
+    font_small = bdf_read("./fonts/cozette.bdf", 1);
+    // font_small = bdf_read("./fonts/scientifica-11.bdf", 1); // this one is /really/ small
+    font_icons = bdf_read("./fonts/siji.bdf", 2);
 
-    if (!today && !passed) {
-        Paint_SelectImage(image_red);
-        Paint_DrawString(x - 2, y - 2, text, font, RED, WHITE);
-    } else if (today && !passed) {
-        Paint_SelectImage(image_red);
-        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
-        Paint_SelectImage(image_black);
-        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
-    } else {
-        Paint_SelectImage(image_black);
-        Paint_DrawString(x - 2, y - 2, text, font, BLACK, WHITE);
-    }
+    week = get_week(NULL, DAY_SUNDAY);
 }
 
-void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
+void destroy_calendar() {
+    image_black = NULL;
+    image_red = NULL;
+
+    bdf_free(font_large);
+    bdf_free(font_large_mono);
+    bdf_free(font_medium);
+    bdf_free(font_small);
+    bdf_free(font_icons);
+
+    free_week(week);
+}
+
+void draw_calendar() {
     int w = EPD_0583_1_WIDTH, h = EPD_0583_1_HEIGHT;
 
-    t_week_boundary boundary = get_week_boundaries(NULL, DAY_SUNDAY);
     size_t buf_size = 64;
     char buf[65] = {0};
-
-    bdf_t *font_large = bdf_read("./fonts/LodeSans-15.bdf", 2);
-    bdf_t *font_large_mono = bdf_read("./fonts/LodeSansMono-15.bdf", 2);
-    bdf_t *font_medium = bdf_read("./fonts/cozette.bdf", 2);
-    bdf_t *font_small = bdf_read("./fonts/cozette.bdf", 1);
-    // bdf_t *font_small = bdf_read("./fonts/scientifica-11.bdf", 1); // this one is /really/ small
-    bdf_t *font_icons = bdf_read("./fonts/siji.bdf", 2);
 
     // Clear images
     Paint_SelectImage(image_red);
@@ -269,22 +259,18 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         ++hour.tm_hour;
     }
 
-    struct tm today = {0};
-    time_t now = time(NULL);
-    localtime_r(&now, &today);
-
     // vertical day separators
     for (i = 0; i < 7; ++i) {
         x = 61 + i * 82;
         Paint_DrawLine(x, 74, x, 103, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
         Paint_DrawLine(x, 103, x, h - 15, WHITE, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
-        struct tm day = *boundary.tm_start;
+        struct tm day = week.start;
         day.tm_mday += i;
         mktime(&day);
 
         // highlight the current day
-        if (day.tm_mday == today.tm_mday) {
+        if (day.tm_mday == week.today.tm_mday) {
             Paint_SelectImage(image_red);
         }
 
@@ -296,7 +282,7 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         strftime(buf, buf_size, "%d", &day);
         Paint_DrawString(x + 48, 68, buf, font_large_mono, BLACK, WHITE);
 
-        if (day.tm_mday == today.tm_mday) {
+        if (day.tm_mday == week.today.tm_mday) {
             Paint_SelectImage(image_black);
         }
     }
@@ -304,38 +290,56 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     // white horizontal separator
     Paint_DrawLine(14, 101, w - 14, 101, WHITE, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
 
-    strftime(buf, buf_size, "Calendar - %d %B %Y", &today);
+    // header
+    strftime(buf, buf_size, "Calendar - %d %B %Y", &week.today);
     Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
+}
 
-    // Draw red picture
-    Paint_SelectImage(image_red);
-    /*
-    Paint_DrawLine(100, 0, 100, h, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-    Paint_DrawLine(0, 300, w, 300, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);*/
+void draw_event(char *text, bdf_t *font, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
+    uint16_t x = 65 + day_of_week * 82;
+    uint16_t w = 74;
+    uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
+    uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1) : ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3);
+    uint16_t h = quarter_length * 11 + skip_borders;
 
-    draw_event(image_black, image_red, "length", font_small, 0, 3, DAY_SUNDAY);
-    draw_event(image_black, image_red, "of", font_small, 3, 2, DAY_SUNDAY);
-    draw_event(image_black, image_red, "more stuff", font_small, 3, 2, DAY_TUESDAY);
-    draw_event(image_black, image_red, "events", font_small, 5, 1, DAY_TUESDAY);
-    for (int j = 0; j < 12; ++j) {
-        draw_event(image_black, image_red, "loop test", font_small, j, 1, DAY_WEDNESDAY);
+    bool passed = day_of_week < DAY_WEDNESDAY || (day_of_week == DAY_WEDNESDAY && (quarter_offset + quarter_length) < 6);
+    bool today = day_of_week == DAY_WEDNESDAY;
+
+    if (today && !passed) {
+        Paint_SelectImage(image_red);
+        Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+    } else {
+        Paint_SelectImage(image_black);
+        Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     }
-    draw_event(image_black, image_red, "Smalltalk", font_small, 3, 4, DAY_THURSDAY);
-    draw_event(image_black, image_red, "Smalltalk2", font_small, 7, 1, DAY_THURSDAY);
-    draw_event(image_black, image_red, "Smalltalk3", font_small, 8, 4, DAY_THURSDAY);
-    draw_event(image_black, image_red, "Some Meeting", font_small, 12, 1, DAY_THURSDAY);
-    draw_event(image_black, image_red, "Call me", font_small, 13, 2, DAY_THURSDAY);
 
-    bdf_free(font_large);
-    bdf_free(font_large_mono);
-    bdf_free(font_medium);
-    bdf_free(font_small);
-    bdf_free(font_icons);
+    if (!today && !passed) {
+        Paint_SelectImage(image_red);
+        Paint_DrawString(x - 2, y - 2, text, font, RED, WHITE);
+    } else if (today && !passed) {
+        Paint_SelectImage(image_red);
+        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
+        Paint_SelectImage(image_black);
+        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
+    } else {
+        Paint_SelectImage(image_black);
+        Paint_DrawString(x - 2, y - 2, text, font, BLACK, WHITE);
+    }
+}
 
-    free_week_boundaries(boundary);
-
-    EPD_0583_1_Display(image_black, image_red);
-    DEV_Delay_ms(3000);
+void draw_events() {
+    draw_event("length", font_small, 0, 3, DAY_SUNDAY);
+    draw_event("of", font_small, 3, 2, DAY_SUNDAY);
+    draw_event("more stuff", font_small, 3, 2, DAY_TUESDAY);
+    draw_event("events", font_small, 5, 1, DAY_TUESDAY);
+    for (int j = 0; j < 12; ++j) {
+        draw_event("loop test", font_small, j, 1, DAY_WEDNESDAY);
+    }
+    draw_event("Smalltalk", font_small, 3, 4, DAY_THURSDAY);
+    draw_event("Smalltalk2", font_small, 7, 1, DAY_THURSDAY);
+    draw_event("Smalltalk3", font_small, 8, 4, DAY_THURSDAY);
+    draw_event("Some Meeting", font_small, 12, 1, DAY_THURSDAY);
+    draw_event("Call me", font_small, 13, 2, DAY_THURSDAY);
 }
 
 #endif

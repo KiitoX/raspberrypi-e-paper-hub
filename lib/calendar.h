@@ -25,18 +25,22 @@ void close_session();
 #define DAY_SATURDAY 6
 
 typedef struct {
-    char *start, *end;
-    struct tm *tm_start;
-} t_week_boundary;
+    char *start_string, *end_string;
+    struct tm start, end, today;
+} t_week;
 
-t_week_boundary get_week_boundaries(const char *time_zone, int week_start);
-void free_week_boundaries(t_week_boundary boundary);
+t_week get_week(const char *time_zone, int week_start);
+void free_week(t_week week);
 
 #ifdef EPD
 
 #include "epd/ER-EPD0583-1.h"
 #include "epd/GUI_Paint.h"
 
-void draw_calendar(UBYTE *image_black, UBYTE *image_red);
+void init_calendar(UBYTE *image_black_, UBYTE *image_red_);
+void destroy_calendar();
+
+void draw_calendar();
+void draw_events();
 
 #endif

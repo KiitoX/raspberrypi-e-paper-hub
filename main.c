@@ -27,6 +27,7 @@ int main() {
     signal(SIGINT, signal_handler);
 #endif
 
+#ifdef BDF_TEST
     int scale = 1;
     bdf_t *cozette = bdf_read("./fonts/cozette.bdf", scale);
     bdf_t *lode_sans = bdf_read("./fonts/LodeSans-15.bdf", scale);
@@ -36,8 +37,13 @@ int main() {
     bdf_t *siji = bdf_read("./fonts/siji.bdf", scale);
     bdf_t *ctrld_13 = bdf_read("./fonts/ctrld-fixed-13r.bdf", scale);
     bdf_t *ctrld_16 = bdf_read("./fonts/ctrld-fixed-16r.bdf", scale);
+#endif
 
-#ifdef GAPI_TEST
+#ifdef EPD_TEST
+    bdf_t *font = bdf_read("./fonts/cozette.bdf", 2);
+#endif
+
+#ifdef GAPI
     create_session();
 #endif
 
@@ -61,6 +67,8 @@ int main() {
 
     Paint_NewImage(image_black, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_180, WHITE);
     Paint_NewImage(image_red, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_180, WHITE);
+
+    init_calendar(image_black, image_red);
 #endif
 
     /**
@@ -119,14 +127,14 @@ int main() {
     // this is paginated, we will want to go through until we're done, though also limit it to &current_week
     const char *eventsListGet = "https://www.googleapis.com/calendar/v3/calendars/manuel.manu.delfin@gmail.com/events";
 
-    t_week_boundary boundary = get_week_boundaries(time_zone, week_start);
+    t_week week = get_week(time_zone, week_start);
 
     struct _u_request req = init_api_request(eventsListGet);
     ulfius_set_request_properties(&req,
                                   U_OPT_URL_PARAMETER, "singleEvents", "true", // expand recurring events
                                   U_OPT_URL_PARAMETER, "orderBy", "startTime",
-                                  U_OPT_URL_PARAMETER, "timeMin", boundary.start,
-                                  U_OPT_URL_PARAMETER, "timeMax", boundary.end,
+                                  U_OPT_URL_PARAMETER, "timeMin", week.start_string,
+                                  U_OPT_URL_PARAMETER, "timeMax", week.end_string,
                                   U_OPT_NONE);
     j_resp = get_api_response(req);
     if (j_resp != NULL) {
@@ -134,7 +142,7 @@ int main() {
 
         json_decref(j_resp);
     }
-    free_week_boundaries(boundary);
+    free_week(week);
     free(time_zone);
 #endif
 
@@ -177,8 +185,16 @@ int main() {
 
 #endif
 
-    draw_calendar(image_black, image_red);
+#ifdef EPD
+
+    draw_calendar();
+
+#ifdef GAPI
+    draw_events();
+#endif
+
     exit(0); // quit early
+#endif
 
 #ifdef EPD_TEST
 
@@ -196,8 +212,8 @@ int main() {
     Paint_DrawLine(100, 200, 100, 300, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     Paint_DrawLine(50, 250, 150, 250, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
-    Paint_DrawString(350, 10, "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ", cozette, BLACK, WHITE);
-    Paint_DrawString(10, 335, "testing the black cozette", cozette, BLACK, WHITE);
+    Paint_DrawString(350, 10, "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ", font, BLACK, WHITE);
+    Paint_DrawString(10, 335, "testing the black cozette", font, BLACK, WHITE);
 
     // Draw red picture
     Paint_SelectImage(image_red);
@@ -209,8 +225,8 @@ int main() {
     Paint_DrawCircle(100, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_EMPTY);
     Paint_DrawCircle(250, 250, 50, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
 
-    Paint_DrawString(10, 310, "hello! e-paper", cozette, WHITE, RED);
-    Paint_DrawString(10, 360, "0123456789", cozette, RED, WHITE);
+    Paint_DrawString(10, 310, "hello! e-paper", font, WHITE, RED);
+    Paint_DrawString(10, 360, "0123456789", font, RED, WHITE);
 
     EPD_0583_1_Display(image_black, image_red);
     DEV_Delay_ms(3000);
@@ -221,6 +237,8 @@ int main() {
      */
 
 #ifdef EPD
+    destroy_calendar();
+
     EPD_0583_1_Clear();
 
     EPD_0583_1_Sleep();
@@ -231,10 +249,11 @@ int main() {
     DEV_Module_Exit();
 #endif
 
-#ifdef GAPI_TEST
+#ifdef GAPI
     close_session();
 #endif
 
+#ifdef BDF_TEST
     bdf_free(cozette);
     bdf_free(lode_sans);
     bdf_free(kakwafont);
@@ -243,6 +262,7 @@ int main() {
     bdf_free(siji);
     bdf_free(ctrld_13);
     bdf_free(ctrld_16);
+#endif
 
     return 0;
 }
