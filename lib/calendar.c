@@ -190,6 +190,15 @@ void free_week_boundaries(t_week_boundary boundary) {
 
 #ifdef EPD
 
+void draw_event(char *text, uint8_t quarter_offset, uint8_t quarter_length, uint8_t day_of_week) {
+    uint8_t x = 67 + day_of_week * 82;
+    uint8_t w = 72;
+    uint8_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
+    uint8_t h = quarter_length * 11 + (quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1);
+
+    Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
+}
+
 void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     int w = EPD_0583_1_WIDTH, h = EPD_0583_1_HEIGHT;
 
@@ -218,7 +227,6 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     for (i = 0; i < 13; ++i) {
         y = 128 + i * 26;
         Paint_DrawLine(13, y, w - 13, y, BLACK, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
-
     }
 
     // hour labels
@@ -231,8 +239,9 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         ++hour.tm_hour;
     }
 
-    // borders
+    // border
     Paint_DrawRectangle(13, 13, w - 12, h - 12, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
+    // horizontal divide
     Paint_DrawLine(13, 100, w - 13, 100, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
     struct tm today = {0};
@@ -274,6 +283,13 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     /*
     Paint_DrawLine(100, 0, 100, h, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
     Paint_DrawLine(0, 300, w, 300, RED, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);*/
+
+    draw_event("", 0, 3, DAY_SUNDAY);
+    draw_event("", 3, 2, DAY_SUNDAY);
+    draw_event("", 5, 1, DAY_TUESDAY);
+    draw_event("", 8, 4, DAY_THURSDAY);
+    draw_event("", 12, 1, DAY_THURSDAY);
+    draw_event("", 13, 2, DAY_THURSDAY);
 
     bdf_free(font_large);
     bdf_free(font_large_mono);
