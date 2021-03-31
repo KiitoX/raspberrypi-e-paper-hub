@@ -200,7 +200,8 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     bdf_t *font_large = bdf_read("./fonts/LodeSans-15.bdf", 2);
     bdf_t *font_large_mono = bdf_read("./fonts/LodeSansMono-15.bdf", 2);
     bdf_t *font_medium = bdf_read("./fonts/cozette.bdf", 2);
-    bdf_t *font_small = bdf_read("./fonts/scientifica-11.bdf", 1);
+    bdf_t *font_small = bdf_read("./fonts/cozette.bdf", 1);
+    // bdf_t *font_small = bdf_read("./fonts/scientifica-11.bdf", 1); // this one is /really/ small
     bdf_t *font_icons = bdf_read("./fonts/siji.bdf", 2);
 
     // Clear images
@@ -226,13 +227,13 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         y = 103 + i * 26;
         strftime(buf, buf_size, "%H", &hour);
         Paint_DrawString(15, y, buf, font_medium, BLACK, WHITE);
-        Paint_DrawString(45, y, "00", font_small, BLACK, WHITE);
+        Paint_DrawString(43, y, "00", font_small, BLACK, WHITE);
         ++hour.tm_hour;
     }
 
     // borders
     Paint_DrawRectangle(13, 13, w - 12, h - 12, BLACK, DOT_PIXEL_3X3, DRAW_FILL_EMPTY);
-    Paint_DrawLine(13, 99, w - 13, 99, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
+    Paint_DrawLine(13, 100, w - 13, 100, BLACK, DOT_PIXEL_3X3, LINE_STYLE_SOLID);
 
     struct tm today = {0};
     time_t now = time(NULL);
