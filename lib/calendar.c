@@ -220,9 +220,10 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
 
     }
 
+    // hour labels
     struct tm hour = {0, .tm_hour = 7};
     for (i = 0; i < 14; ++i) {
-        y = 103 + i * 26;
+        y = 102 + i * 26;
         strftime(buf, buf_size, "%H", &hour);
         Paint_DrawString(15, y, buf, font_medium, BLACK, WHITE);
         ++hour.tm_hour;
@@ -245,13 +246,16 @@ void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
         day.tm_mday += i;
         mktime(&day);
 
+        // highlight the current day
         if (day.tm_mday == today.tm_mday) {
             Paint_SelectImage(image_red);
         }
 
+        // short weekday name
         strftime(buf, buf_size, "%a", &day);
-        Paint_DrawString(x + 2, 72, buf, font_medium, BLACK, WHITE);
+        Paint_DrawString(x + 1, 73, buf, font_medium, BLACK, WHITE);
 
+        // day of month
         strftime(buf, buf_size, "%d", &day);
         Paint_DrawString(x + 48, 68, buf, font_large_mono, BLACK, WHITE);
 
