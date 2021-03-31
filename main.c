@@ -178,6 +178,7 @@ int main() {
 #endif
 
     draw_calendar(image_black, image_red);
+    exit(0); // quit early
 
 #ifdef EPD_TEST
 
