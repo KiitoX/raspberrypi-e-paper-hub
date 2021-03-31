@@ -194,7 +194,7 @@ void draw_event(char *text, uint8_t quarter_offset, uint8_t quarter_length, uint
     uint8_t x = 67 + day_of_week * 82;
     uint8_t w = 72;
     uint8_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
-    uint8_t h = quarter_length * 11 + (quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1);
+    uint8_t h = quarter_length * 11 + ((quarter_offset % 2) ? ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3) : ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1));
 
     printf("x:%d, y:%d, w:%d, h:%d\n", x, y, w, h);
     Paint_DrawRectangle(x, y, x + w, y + h, RED, DOT_PIXEL_1X1, DRAW_FILL_FULL);
