@@ -54,14 +54,14 @@ int create_session() {
     // https://developers.google.com/calendar/auth
     // https://calendar-json.googleapis.com/$discovery/rest?version=v3
     i_set_parameter_list(&i_session,
-                         I_OPT_RESPONSE_TYPE, 0b11,
+                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE,
                          I_OPT_OPENID_CONFIG_ENDPOINT, GAPI_CONFIG_ENDPOINT,
                          I_OPT_CLIENT_ID, GAPI_CLIENT_ID,
                          I_OPT_CLIENT_SECRET, GAPI_CLIENT_SECRET,
-                         I_OPT_REDIRECT_URI, "https://emma.click/oauth2redirect",
-                         I_OPT_AUTH_ENDPOINT, "https://accounts.google.com/o/oauth2/auth",
-                         I_OPT_TOKEN_ENDPOINT, "https://accounts.google.com/o/oauth2/token",
-                         I_OPT_REVOCATION_ENDPOINT, "https://accounts.google.com/o/oauth2/revoke",
+                         //I_OPT_REDIRECT_URI, "https://emma.click/oauth2redirect",
+                         //I_OPT_AUTH_ENDPOINT, "https://accounts.google.com/o/oauth2/auth",
+                         //I_OPT_TOKEN_ENDPOINT, "https://accounts.google.com/o/oauth2/token",
+                         //I_OPT_REVOCATION_ENDPOINT, "https://accounts.google.com/o/oauth2/revoke",
                          I_OPT_SCOPE, "https://www.googleapis.com/auth/calendar.readonly " // note the space at the end
                                       "https://www.googleapis.com/auth/calendar.events.readonly "
                                       "https://www.googleapis.com/auth/calendar.settings.readonly",
