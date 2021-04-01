@@ -27,6 +27,9 @@ int import_session() {
     json_t *j_session = json_load_file(session_store, 0, NULL);
     if (j_session == NULL) {
         return I_ERROR;
+    } else {
+        printf("Successful import: \n");
+        JSON_DEBUG(j_session);
     }
 
     int ret = i_import_session_json_t(&i_session, j_session);
