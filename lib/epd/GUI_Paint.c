@@ -739,6 +739,12 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
             assert(false && "We should not get here");
         } else if (offset >= ((size_t)-2)) {
             Debug("Paint_DrawString: String '%s' contains invalid UTF-8 characters (%ld)\n", string, offset);
+
+            printf("Hexdump:");
+            for (int i = 0; i < strlen(string); ++i) {
+                printf(" %2x", (uint8_t)string[i]);
+            }
+            puts("");
             return;
         }
 
