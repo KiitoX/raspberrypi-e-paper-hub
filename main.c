@@ -121,12 +121,14 @@ int main() {
     load_events();
 
     draw_events();
+
+    printf("FINISHED DRAWING EVENTS\n");
 #endif
 
     EPD_0583_1_Display(image_black, image_red);
     DEV_Delay_ms(3000);
 
-    exit(0); // quit early
+    //exit(0); // quit early
 #endif
 
 #ifdef EPD_TEST
