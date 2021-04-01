@@ -54,7 +54,7 @@ int create_session() {
     // https://developers.google.com/calendar/auth
     // https://calendar-json.googleapis.com/$discovery/rest?version=v3
     i_set_parameter_list(&i_session,
-                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE,
+                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE | I_RESPONSE_TYPE_TOKEN,
                          I_OPT_OPENID_CONFIG_ENDPOINT, GAPI_CONFIG_ENDPOINT,
                          I_OPT_CLIENT_ID, GAPI_CLIENT_ID,
                          I_OPT_CLIENT_SECRET, GAPI_CLIENT_SECRET,
@@ -118,6 +118,21 @@ int create_session() {
     // this is something the lib is supposed to do itself, but it doesn't so eyyyy
     i_session.expires_at = now + ((time_t)i_session.expires_in);
 
+    printf("init with access: %s, refresh: %s\n", i_get_str_parameter(&i_session, I_OPT_ACCESS_TOKEN), i_get_str_parameter(&i_session, I_OPT_REFRESH_TOKEN));
+
+    return 0;
+}
+
+int refresh_token() {
+    time_t now = time(NULL);
+    if (i_run_token_request(&i_session) != I_OK) {
+        printf("Error running refresh token request\n");
+        close_session();
+        return 1;
+    }
+
+    // this is something the lib is supposed to do itself, but it doesn't so eyyyy
+    i_session.expires_at = now + ((time_t)i_session.expires_in);
     return 0;
 }
 

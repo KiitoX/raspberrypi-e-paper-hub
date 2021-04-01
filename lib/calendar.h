@@ -11,6 +11,7 @@
 #define JSON_DEBUG(json) char *debug_dump = json_dumps(json, JSON_INDENT(2)); puts(debug_dump); free(debug_dump)
 
 int create_session();
+int refresh_token();
 struct _u_request init_api_request(const char *url);
 json_t *get_api_response(struct _u_request req);
 json_t *api_request(const char *url);

@@ -136,10 +136,12 @@ int main() {
         load_events();
 
         draw_events(image_black, image_red);
+
+        refresh_token();
 #endif
 
         EPD_0583_1_Display(image_black, image_red);
-        DEV_Delay_ms(60 * 60 * 1000 /* 1 hour */);
+        DEV_Delay_ms(30 * 60 * 1000 /* 30 minutes */);
     }
 #endif
 
