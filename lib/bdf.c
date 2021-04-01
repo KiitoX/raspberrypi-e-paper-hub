@@ -213,11 +213,12 @@ size_t clamp(size_t val, size_t lower, size_t upper) {
 }
 
 int compare_encoding(const void *a, const void *b) {
-    return *(encoding_t *)a - ((bitmap_t *)b)->encoding;
+    return (*((encoding_t *)a)) - (((bitmap_t *)b)->encoding);
 }
 
 // binary search
 bitmap_t *bdf_get_bitmap(bdf_t *font, encoding_t encoding) {
+    printf("Looking up character %lc (%d)\n", encoding, encoding);
     return bsearch(&encoding, font->characters, font->numChars, sizeof(*font->characters), compare_encoding);
 }
 
