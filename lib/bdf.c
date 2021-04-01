@@ -218,7 +218,7 @@ int compare_encoding(const void *a, const void *b) {
 
 // binary search
 bitmap_t *bdf_get_bitmap(bdf_t *font, encoding_t encoding) {
-    printf("Looking up character %lc (%d)\n", encoding, encoding);
+    printf("Looking up character '%lc' (%d) in %s (%ld)\n", encoding, encoding, font->familyName, font->numChars);
     return bsearch(&encoding, font->characters, font->numChars, sizeof(*font->characters), compare_encoding);
 }
 
