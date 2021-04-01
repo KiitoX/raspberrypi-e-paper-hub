@@ -289,9 +289,6 @@ void load_events() {
 
                 json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
                     struct event *evt = &cal->events[i];
-#ifdef GAPI_TEST
-                    JSON_DEBUG(j_elem);
-#endif
                     json_t *summary = json_object_get(j_elem, "summary");
                     assert(json_is_string(summary));
                     evt->name = calloc(json_string_length(summary) + 1, sizeof(*evt->name));
@@ -518,6 +515,8 @@ void draw_events() {
         for (int j = 0; j < cal->num_events; ++j) {
             struct event *evt = &cal->events[j];
 
+            printf("i:%d j:%d\n", i, j);
+
             if (evt->all_day) {
                 // TODO
             } else {
@@ -531,21 +530,6 @@ void draw_events() {
             }
         }
     }
-
-    /*
-    draw_event("length", font_small, 0, 3, DAY_SUNDAY);
-    draw_event("of", font_small, 3, 2, DAY_SUNDAY);
-    draw_event("more stuff", font_small, 3, 2, DAY_TUESDAY);
-    draw_event("events", font_small, 5, 1, DAY_TUESDAY);
-    for (int j = 0; j < 12; ++j) {
-        draw_event("loop test", font_small, j, 1, DAY_WEDNESDAY);
-    }
-    draw_event("Smalltalk", font_small, 3, 4, DAY_THURSDAY);
-    draw_event("Smalltalk2", font_small, 7, 1, DAY_THURSDAY);
-    draw_event("Smalltalk3", font_small, 8, 4, DAY_THURSDAY);
-    draw_event("Some Meeting", font_small, 12, 1, DAY_THURSDAY);
-    draw_event("Call me", font_small, 13, 2, DAY_THURSDAY);
-     */
 }
 
 #endif
