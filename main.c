@@ -9,11 +9,13 @@
 #ifdef EPD
 #include "lib/epd/ER-EPD0583-1.h"
 #include "lib/epd/GUI_Paint.h"
+#endif
+
+bool g_running = true;
 
 void signal_handler(int signo) {
-    DEV_Module_Exit();
+    g_running = false;
 }
-#endif
 
 int main() {
     /**
@@ -30,9 +32,7 @@ int main() {
     // You will want the values shown by `locale` to end in .UTF-8
     assert(MB_CUR_MAX == 6);
 
-#ifdef EPD
     signal(SIGINT, signal_handler);
-#endif
 
 #ifdef BDF_TEST
     int scale = 1;
@@ -129,16 +129,18 @@ int main() {
 #endif
 
 #ifdef EPD
-    draw_calendar(image_black, image_red);
+    while (g_running) {
+        draw_calendar(image_black, image_red);
 
 #ifdef GAPI
-    load_events();
+        load_events();
 
-    draw_events(image_black, image_red);
+        draw_events(image_black, image_red);
 #endif
 
-    EPD_0583_1_Display(image_black, image_red);
-    DEV_Delay_ms(3000);
+        EPD_0583_1_Display(image_black, image_red);
+        DEV_Delay_ms(60 * 60 * 1000 /* 1 hour */);
+    }
 #endif
 
 #ifdef EPD_TEST
