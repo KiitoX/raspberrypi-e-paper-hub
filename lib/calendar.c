@@ -21,6 +21,21 @@
 
 struct _i_session i_session;
 
+const char *session_store = "./oauth2.session";
+
+int import_session() {
+    json_t *j_session = json_load_file(session_store, 0, NULL);
+    if (j_session == NULL) {
+        return I_ERROR;
+    }
+
+    int ret = i_import_session_json_t(&i_session, j_session);
+
+    json_decref(j_session);
+
+    return ret;
+}
+
 int create_session() {
     int ret;
 
@@ -29,6 +44,11 @@ int create_session() {
     y_init_logs("Iddawc", Y_LOG_MODE_CONSOLE, Y_LOG_LEVEL_DEBUG, NULL, "Starting Iddawc client program");
 
     i_init_session(&i_session);
+
+    if (import_session() == I_OK) {
+        return 0;
+    }
+
     // Details on these parameters:
     // https://developers.google.com/identity/protocols/oauth2
     // https://developers.google.com/calendar/auth
@@ -81,7 +101,6 @@ int create_session() {
 
     printf("Got redirect [%lu]'%s'\n", strlen(redirect_url), redirect_url);
 
-    time_t now = time(NULL);
     i_set_str_parameter(&i_session, I_OPT_REDIRECT_TO, redirect_url);
     if (i_parse_redirect_to(&i_session) != I_OK) {
         printf("Error parsing redirect url\n");
@@ -89,6 +108,7 @@ int create_session() {
         return 1;
     }
 
+    time_t now = time(NULL);
     if (i_run_token_request(&i_session) != I_OK) {
         printf("Error running token request\n");
         close_session();
@@ -136,9 +156,21 @@ json_t *api_request(const char *url) {
     return get_api_response(req);
 }
 
+void export_session() {
+    json_t *j_session = i_export_session_json_t(&i_session);
+    assert(j_session != NULL);
+
+    int ret = json_dump_file(j_session, session_store, 0);
+
+    json_decref(j_session);
+
+    if (ret != 0) {
+        printf("Failed to store session\n");
+    }
+}
+
 void close_session() {
-    char *oauth2_session = i_export_session_str(&i_session);
-    printf("%s\n", oauth2_session);
+    export_session();
 
     i_clean_session(&i_session);
 

@@ -56,9 +56,9 @@ int main() {
     init_google_calendar();
 #endif
 
+#ifdef EPD
     init_calendar();
 
-#ifdef EPD
     assert(DEV_Module_Init() == 0);
 
     EPD_0583_1_Init();
@@ -83,6 +83,14 @@ int main() {
     /**
      * Main
      */
+
+#ifdef GAPI_TEST
+    json_t *j_resp = api_request("https://www.googleapis.com/calendar/v3/users/me/settings");
+    if (j_resp != NULL) {
+        JSON_DEBUG(j_resp);
+        json_decref(j_resp);
+    }
+#endif
 
 #ifdef BDF_TEST
     puts("");
@@ -118,7 +126,6 @@ int main() {
 
     }
 #endif
-
 #endif
 
 #ifdef EPD
@@ -132,7 +139,6 @@ int main() {
 
     EPD_0583_1_Display(image_black, image_red);
     DEV_Delay_ms(3000);
-
 #endif
 
 #ifdef EPD_TEST
@@ -174,9 +180,9 @@ int main() {
      * Cleanup
      */
 
+#ifdef EPD
     destroy_calendar();
 
-#ifdef EPD
     EPD_0583_1_Clear();
 
     EPD_0583_1_Sleep();
