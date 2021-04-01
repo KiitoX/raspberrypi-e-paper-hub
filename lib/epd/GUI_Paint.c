@@ -692,7 +692,6 @@ int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UW
     bitmap_t *bitmap = bdf_get_bitmap(font, character);
     if (bitmap == NULL) {
         Debug("Paint_DrawChar: Character '%lc' U+%04llX is not in bitmap\n",  character, character);
-        printf("Paint_DrawChar: Character '%lc' U+%04llX is not in bitmap\n",  character, character);
         return 0;
     }
 
@@ -736,6 +735,7 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
 
     while (*string != '\0') {
         offset = mbrtowc(&character, string, MB_CUR_MAX, &state);
+        printf("Paint_DrawString: Character '%lc' U+%04X\n", character, character);
         if (offset <= 0) {
             Debug("Paint_DrawString: String contains invalid UTF-8 characters");
             return;

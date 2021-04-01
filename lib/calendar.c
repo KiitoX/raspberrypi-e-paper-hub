@@ -523,7 +523,7 @@ void draw_events() {
                 int length = (evt->end.tm_hour - evt->start.tm_hour) * 4 + (evt->end.tm_min - evt->start.tm_min) / 30;
 
                 strftime(buf, 127, "%a %F %T", &evt->start);
-                printf("'%s' on %s, at %d+%d\n", evt->name, buf, offset, length);
+                printf("'%s'[%ld] on %s, at %d+%d\n", evt->name, strlen(evt->name), buf, offset, length);
 
                 draw_event(evt->name, offset, length, evt->start.tm_wday);
             }
