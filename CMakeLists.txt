@@ -3,6 +3,8 @@ project(epaper C)
 
 set(CMAKE_C_STANDARD 11)
 
+add_compile_definitions(_DEFAULT_SOURCE)
+
 #add_compile_definitions(DEBUG)
 #add_compile_definitions(BDF_DEBUG)
 #add_compile_definitions(BDF_TEST)

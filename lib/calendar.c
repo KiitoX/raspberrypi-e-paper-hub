@@ -2,11 +2,17 @@
 // Created by emma on 27/03/2021.
 //
 
+#define _XOPEN_SOURCE
+#include <time.h>
+#undef _XOPEN_SOURCE
+
 #include "calendar.h"
 
 #include <yder.h>
 #include <ulfius.h>
 #include <string.h>
+#include <assert.h>
+#include <errno.h>
 
 #define GAPI_CONFIG_ENDPOINT "https://accounts.google.com/.well-known/openid-configuration"
 // define GAPI_CLIENT_ID, GAPI_CLIENT_SECRET with your own values here
@@ -166,12 +172,12 @@ t_week get_week(const char *time_zone, int week_start) {
     char date_buf[len_buf];
 
     len = strftime(date_buf, len_buf - 1, "%FT%T%z", &week.start);
-    week.start_string = calloc(len, sizeof(*week.start_string + 1));
+    week.start_string = calloc(len + 1, sizeof(*week.start_string));
     strncpy(week.start_string, date_buf, len);
     printf("Starting at: %s\n", week.start_string);
 
     len = strftime(date_buf, len_buf - 1, "%FT%T%z", &week.end);
-    week.end_string = calloc(len, sizeof(*week.end_string + 1));
+    week.end_string = calloc(len + 1, sizeof(*week.end_string));
     strncpy(week.end_string, date_buf, len);
     printf("Ending at: %s\n", week.end_string);
 
@@ -183,7 +189,7 @@ void free_week(t_week week) {
     free(week.end_string);
 }
 
-t_google_calendar g_calendar;
+t_google_calendar g_calendar = {0};
 
 void load_calendar_list() {
     json_t *j_resp = api_request("https://www.googleapis.com/calendar/v3/users/me/calendarList");
@@ -200,16 +206,17 @@ void load_calendar_list() {
                     --g_calendar.num_calendars;
                 } else {
                     struct calendar *cal = &g_calendar.calendars[i];
-                    if (json_is_string(json_object_get(j_elem, "id")) &&
-                        json_is_string(json_object_get(j_elem, "summary"))) {
-                        json_t *id = json_object_get(j_elem, "id");
-                        cal->id = malloc(json_string_length(id));
-                        strncpy(cal->id, json_string_value(id), json_string_length(id));
 
-                        json_t *summary = json_object_get(j_elem, "summary");
-                        cal->name = malloc(json_string_length(summary));
-                        strncpy(cal->name, json_string_value(summary), json_string_length(summary));
-                    }
+                    json_t *id = json_object_get(j_elem, "id");
+                    assert(json_is_string(id));
+                    cal->id = calloc(json_string_length(id) + 1, sizeof(*cal->id));
+                    strncpy(cal->id, json_string_value(id), json_string_length(id));
+
+                    json_t *summary = json_object_get(j_elem, "summary");
+                    assert(json_is_string(summary));
+                    cal->name = calloc(json_string_length(summary) + 1, sizeof(*cal->name));
+                    strncpy(cal->name, json_string_value(summary), json_string_length(summary));
+
                     if (json_is_boolean(json_object_get(j_elem, "primary")) &&
                         json_boolean_value(json_object_get(j_elem, "primary"))) {
                         g_calendar.primary = cal;
@@ -229,17 +236,19 @@ void load_user_settings() {
     if (j_resp != NULL) {
         json_t *j_elem;
         size_t i;
+        json_t *key_tz = json_string("timezone");
+        json_t *key_week = json_string("weekStart");
         if (json_is_array(json_object_get(j_resp, "items"))) {
             json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
-                if (json_is_string(json_object_get(j_elem, "id")) &&
-                    json_is_string(json_object_get(j_elem, "value"))) {
-                    if (json_equal(json_object_get(j_elem, "id"), json_string("timezone"))) {
-                        json_t *time_zone = json_object_get(j_elem, "value");
-                        g_calendar.time_zone = malloc(json_string_length(time_zone));
-                        strncpy(g_calendar.time_zone, json_string_value(time_zone), json_string_length(time_zone));
-                    } else if (json_equal(json_object_get(j_elem, "value"), json_string("weekStart"))) {
+                json_t *id = json_object_get(j_elem, "id");
+                json_t *value = json_object_get(j_elem, "value");
+                if (json_is_string(id) && json_is_string(value)) {
+                    if (json_equal(id, key_tz)) {
+                        g_calendar.time_zone = calloc(json_string_length(value) + 1, sizeof(*g_calendar.time_zone));
+                        strncpy(g_calendar.time_zone, json_string_value(value), json_string_length(value));
+                    } else if (json_equal(id, key_week)) {
                         // week start: "0": Sunday, "1": Monday, "6": Saturday
-                        const char *week_start = json_string_value(json_object_get(j_elem, "value"));
+                        const char *week_start = json_string_value(value);
                         errno = 0;
                         g_calendar.week_start = (int)strtol(week_start, NULL, 10);
                         assert(errno == 0);
@@ -247,16 +256,20 @@ void load_user_settings() {
                 }
             }
         }
+        json_decref(key_tz);
+        json_decref(key_week);
         json_decref(j_resp);
     }
 }
 
-void get_events() {
+void load_events() {
     char url_buffer[256];
     size_t buf_size = 256;
 
-    for (int i = 0; i < g_calendar.num_calendars; ++i) {
-        snprintf(url_buffer, buf_size, "https://www.googleapis.com/calendar/v3/calendars/%s/events", g_calendar.calendars[i].id);
+    for (int j = 0; j < g_calendar.num_calendars; ++j) {
+        struct calendar *cal = &g_calendar.calendars[j];
+
+        snprintf(url_buffer, buf_size, "https://www.googleapis.com/calendar/v3/calendars/%s/events", cal->id);
 
         // the results may be paginated, we will want to go make sure we get everything here
         struct _u_request req = init_api_request(url_buffer);
@@ -267,13 +280,52 @@ void get_events() {
                                       U_OPT_URL_PARAMETER, "timeMax", g_calendar.week.end_string,
                                       U_OPT_NONE);
         json_t *j_resp = get_api_response(req);
-
-
         if (j_resp != NULL) {
-#ifdef GAPI_TEST
-            JSON_DEBUG(j_resp);
-#endif
+            json_t *j_elem;
+            size_t i;
+            if (json_is_array(json_object_get(j_resp, "items"))) {
+                cal->num_events = json_array_size(json_object_get(j_resp, "items"));
+                cal->events = calloc(cal->num_events, sizeof(*cal->events));
 
+                json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
+                    struct event *evt = &cal->events[i];
+#ifdef GAPI_TEST
+                    JSON_DEBUG(j_elem);
+#endif
+                    json_t *summary = json_object_get(j_elem, "summary");
+                    assert(json_is_string(summary));
+                    evt->name = calloc(json_string_length(summary) + 1, sizeof(*evt->name));
+                    strncpy(evt->name, json_string_value(summary), json_string_length(summary));
+
+                    json_t *description = json_object_get(j_elem, "description");
+                    if (json_is_string(description)) {
+                        evt->description = calloc(json_string_length(description) + 1, sizeof(*evt->description));
+                        strncpy(evt->description, json_string_value(description), json_string_length(description));
+                    }
+
+                    json_t *start = json_object_get(j_elem, "start");
+                    assert(json_is_object(start));
+                    json_t *start_date = json_object_get(start, "date");
+                    json_t *start_datetime = json_object_get(start, "dateTime");
+                    if (json_is_string(start_datetime)) {
+                        evt->all_day = false;
+                        assert(strptime(json_string_value(start_datetime), "%FT%T%z", &evt->start) != NULL);
+                    } else if (json_is_string(start_date)) {
+                        evt->all_day = true;
+                        assert(strptime(json_string_value(start_date), "%F", &evt->start) != NULL);
+                    } else assert(false);
+
+                    json_t *end = json_object_get(j_elem, "end");
+                    assert(json_is_object(end));
+                    json_t *end_date = json_object_get(end, "date");
+                    json_t *end_datetime = json_object_get(end, "dateTime");
+                    if (json_is_string(end_datetime)) {
+                        assert(strptime(json_string_value(end_datetime), "%FT%T%z", &evt->end) != NULL);
+                    } else if (json_is_string(end_date)) {
+                        assert(strptime(json_string_value(end_date), "%F", &evt->end) != NULL);
+                    } else assert(false);
+                }
+            }
             json_decref(j_resp);
         }
     }
@@ -299,6 +351,13 @@ void destroy_google_calendar() {
     for (int i = 0; i < g_calendar.num_calendars; ++i) {
         free(g_calendar.calendars[i].id);
         free(g_calendar.calendars[i].name);
+
+        for (int j = 0; j < g_calendar.calendars[i].num_events; ++j) {
+            free(g_calendar.calendars[i].events[j].name);
+            free(g_calendar.calendars[i].events[j].description);
+        }
+
+        free(g_calendar.calendars[i].events);
     }
 
     free(g_calendar.calendars);
@@ -313,7 +372,6 @@ bdf_t *font_large_mono;
 bdf_t *font_medium;
 bdf_t *font_small;
 bdf_t *font_icons;
-t_week week;
 
 UBYTE *image_black;
 UBYTE *image_red;
@@ -328,8 +386,6 @@ void init_calendar(UBYTE *image_black_, UBYTE *image_red_) {
     font_small = bdf_read("./fonts/cozette.bdf", 1);
     // font_small = bdf_read("./fonts/scientifica-11.bdf", 1); // this one is /really/ small
     font_icons = bdf_read("./fonts/siji.bdf", 2);
-
-    week = get_week(NULL, DAY_SUNDAY);
 }
 
 void destroy_calendar() {
@@ -341,9 +397,10 @@ void destroy_calendar() {
     bdf_free(font_medium);
     bdf_free(font_small);
     bdf_free(font_icons);
-
-    free_week(week);
 }
+
+const int hour_start = 7;
+const int hour_segments = 14;
 
 void draw_calendar() {
     int w = EPD_0583_1_WIDTH, h = EPD_0583_1_HEIGHT;
@@ -373,8 +430,8 @@ void draw_calendar() {
     }
 
     // hour labels
-    struct tm hour = {0, .tm_hour = 7};
-    for (i = 0; i < 14; ++i) {
+    struct tm hour = {0, .tm_hour = hour_start};
+    for (i = 0; i < hour_segments; ++i) {
         y = 103 + i * 26;
         strftime(buf, buf_size, "%H", &hour);
         Paint_DrawString(15, y, buf, font_medium, WHITE, WHITE);
@@ -388,12 +445,12 @@ void draw_calendar() {
         Paint_DrawLine(x, 74, x, 103, BLACK, DOT_PIXEL_2X2, LINE_STYLE_SOLID);
         Paint_DrawLine(x, 103, x, h - 15, WHITE, DOT_PIXEL_1X1, LINE_STYLE_DOTTED);
 
-        struct tm day = week.start;
+        struct tm day = g_calendar.week.start;
         day.tm_mday += i;
         mktime(&day);
 
         // highlight the current day
-        if (day.tm_mday == week.today.tm_mday) {
+        if (day.tm_mday == g_calendar.week.today.tm_mday) {
             Paint_SelectImage(image_red);
         }
 
@@ -405,7 +462,7 @@ void draw_calendar() {
         strftime(buf, buf_size, "%d", &day);
         Paint_DrawString(x + 48, 68, buf, font_large_mono, BLACK, WHITE);
 
-        if (day.tm_mday == week.today.tm_mday) {
+        if (day.tm_mday == g_calendar.week.today.tm_mday) {
             Paint_SelectImage(image_black);
         }
     }
@@ -414,19 +471,22 @@ void draw_calendar() {
     Paint_DrawLine(14, 101, w - 14, 101, WHITE, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
 
     // header
-    strftime(buf, buf_size, "Calendar - %d %B %Y", &week.today);
+    strftime(buf, buf_size, "Calendar - %d %B %Y", &g_calendar.week.today);
     Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
 }
 
-void draw_event(char *text, bdf_t *font, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
+void draw_event(char *text, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
+    // the offset and length is in 15 min segments, which are round down/up
+
     uint16_t x = 65 + day_of_week * 82;
     uint16_t w = 74;
     uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
     uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1) : ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3);
     uint16_t h = quarter_length * 11 + skip_borders;
 
-    bool passed = day_of_week < DAY_WEDNESDAY || (day_of_week == DAY_WEDNESDAY && (quarter_offset + quarter_length) < 6);
-    bool today = day_of_week == DAY_WEDNESDAY;
+    int weekday_today = g_calendar.week.today.tm_wday;
+    bool today = day_of_week == weekday_today;
+    bool passed = day_of_week < weekday_today || (today && (quarter_offset + quarter_length) < 6);
 
     if (today && !passed) {
         Paint_SelectImage(image_red);
@@ -438,19 +498,41 @@ void draw_event(char *text, bdf_t *font, uint16_t quarter_offset, uint16_t quart
 
     if (!today && !passed) {
         Paint_SelectImage(image_red);
-        Paint_DrawString(x - 2, y - 2, text, font, RED, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font_small, RED, WHITE);
     } else if (today && !passed) {
         Paint_SelectImage(image_red);
-        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font_small, WHITE, WHITE);
         Paint_SelectImage(image_black);
-        Paint_DrawString(x - 2, y - 2, text, font, WHITE, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font_small, WHITE, WHITE);
     } else {
         Paint_SelectImage(image_black);
-        Paint_DrawString(x - 2, y - 2, text, font, BLACK, WHITE);
+        Paint_DrawString(x - 2, y - 2, text, font_small, BLACK, WHITE);
     }
 }
 
 void draw_events() {
+    char buf[128];
+
+    for (int i = 0; i < g_calendar.num_calendars; ++i) {
+        struct calendar *cal = &g_calendar.calendars[i];
+        for (int j = 0; j < cal->num_events; ++j) {
+            struct event *evt = &cal->events[j];
+
+            if (evt->all_day) {
+                // TODO
+            } else {
+                int offset = (evt->start.tm_hour - hour_start) * 4 + (evt->start.tm_min) / 15;
+                int length = (evt->end.tm_hour - evt->start.tm_hour) * 4 + (evt->end.tm_min - evt->start.tm_min) / 15;
+
+                strftime(buf, 127, "%a %F %T", &evt->start);
+                printf("'%s' on %s, at %d+%d\n", evt->name, buf, offset, length);
+
+                draw_event(evt->name, offset, length, evt->start.tm_wday);
+            }
+        }
+    }
+
+    /*
     draw_event("length", font_small, 0, 3, DAY_SUNDAY);
     draw_event("of", font_small, 3, 2, DAY_SUNDAY);
     draw_event("more stuff", font_small, 3, 2, DAY_TUESDAY);
@@ -463,6 +545,7 @@ void draw_events() {
     draw_event("Smalltalk3", font_small, 8, 4, DAY_THURSDAY);
     draw_event("Some Meeting", font_small, 12, 1, DAY_THURSDAY);
     draw_event("Call me", font_small, 13, 2, DAY_THURSDAY);
+     */
 }
 
 #endif

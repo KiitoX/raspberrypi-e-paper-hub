@@ -40,6 +40,13 @@ typedef struct {
     struct calendar {
         char *id;
         char *name;
+        size_t num_events;
+        struct event {
+            char *name;
+            char *description;
+            bool all_day; // true if start and end are date only
+            struct tm start, end;
+        } *events;
     } *calendars;
     struct calendar *primary;
 } t_google_calendar;
@@ -47,7 +54,7 @@ typedef struct {
 void init_google_calendar();
 void destroy_google_calendar();
 
-void get_events();
+void load_events();
 
 #ifdef EPD
 

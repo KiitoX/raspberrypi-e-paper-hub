@@ -118,7 +118,7 @@ int main() {
     draw_calendar();
 
 #ifdef GAPI
-    get_events();
+    load_events();
 
     draw_events();
 #endif
