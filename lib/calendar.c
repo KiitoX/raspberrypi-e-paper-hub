@@ -183,6 +183,129 @@ void free_week(t_week week) {
     free(week.end_string);
 }
 
+t_google_calendar g_calendar;
+
+void load_calendar_list() {
+    json_t *j_resp = api_request("https://www.googleapis.com/calendar/v3/users/me/calendarList");
+    if (j_resp != NULL) {
+        json_t *j_elem;
+        size_t i;
+        if (json_is_array(json_object_get(j_resp, "items"))) {
+            g_calendar.num_calendars = json_array_size(json_object_get(j_resp, "items"));
+            g_calendar.calendars = calloc(g_calendar.num_calendars, sizeof(*g_calendar.calendars));
+
+            json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
+                if (json_is_boolean(json_object_get(j_elem, "hidden"))) {
+                    // only store calendars not hidden by the user
+                    --g_calendar.num_calendars;
+                } else {
+                    struct calendar *cal = &g_calendar.calendars[i];
+                    if (json_is_string(json_object_get(j_elem, "id")) &&
+                        json_is_string(json_object_get(j_elem, "summary"))) {
+                        json_t *id = json_object_get(j_elem, "id");
+                        cal->id = malloc(json_string_length(id));
+                        strncpy(cal->id, json_string_value(id), json_string_length(id));
+
+                        json_t *summary = json_object_get(j_elem, "summary");
+                        cal->name = malloc(json_string_length(summary));
+                        strncpy(cal->name, json_string_value(summary), json_string_length(summary));
+                    }
+                    if (json_is_boolean(json_object_get(j_elem, "primary")) &&
+                        json_boolean_value(json_object_get(j_elem, "primary"))) {
+                        g_calendar.primary = cal;
+                    }
+                }
+            }
+
+            g_calendar.calendars = reallocarray(g_calendar.calendars, g_calendar.num_calendars, sizeof(*g_calendar.calendars));
+            assert(g_calendar.num_calendars == 0 || g_calendar.calendars != NULL);
+        }
+        json_decref(j_resp);
+    }
+}
+
+void load_user_settings() {
+    json_t *j_resp = api_request("https://www.googleapis.com/calendar/v3/users/me/settings");
+    if (j_resp != NULL) {
+        json_t *j_elem;
+        size_t i;
+        if (json_is_array(json_object_get(j_resp, "items"))) {
+            json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
+                if (json_is_string(json_object_get(j_elem, "id")) &&
+                    json_is_string(json_object_get(j_elem, "value"))) {
+                    if (json_equal(json_object_get(j_elem, "id"), json_string("timezone"))) {
+                        json_t *time_zone = json_object_get(j_elem, "value");
+                        g_calendar.time_zone = malloc(json_string_length(time_zone));
+                        strncpy(g_calendar.time_zone, json_string_value(time_zone), json_string_length(time_zone));
+                    } else if (json_equal(json_object_get(j_elem, "value"), json_string("weekStart"))) {
+                        // week start: "0": Sunday, "1": Monday, "6": Saturday
+                        const char *week_start = json_string_value(json_object_get(j_elem, "value"));
+                        errno = 0;
+                        g_calendar.week_start = (int)strtol(week_start, NULL, 10);
+                        assert(errno == 0);
+                    }
+                }
+            }
+        }
+        json_decref(j_resp);
+    }
+}
+
+void get_events() {
+    char url_buffer[256];
+    size_t buf_size = 256;
+
+    for (int i = 0; i < g_calendar.num_calendars; ++i) {
+        snprintf(url_buffer, buf_size, "https://www.googleapis.com/calendar/v3/calendars/%s/events", g_calendar.calendars[i].id);
+
+        // the results may be paginated, we will want to go make sure we get everything here
+        struct _u_request req = init_api_request(url_buffer);
+        ulfius_set_request_properties(&req,
+                                      U_OPT_URL_PARAMETER, "singleEvents", "true", // expand recurring events
+                                      U_OPT_URL_PARAMETER, "orderBy", "startTime",
+                                      U_OPT_URL_PARAMETER, "timeMin", g_calendar.week.start_string,
+                                      U_OPT_URL_PARAMETER, "timeMax", g_calendar.week.end_string,
+                                      U_OPT_NONE);
+        json_t *j_resp = get_api_response(req);
+
+
+        if (j_resp != NULL) {
+#ifdef GAPI_TEST
+            JSON_DEBUG(j_resp);
+#endif
+
+            json_decref(j_resp);
+        }
+    }
+}
+
+void init_google_calendar() {
+    g_calendar.num_calendars = 0;
+    g_calendar.week_start = DAY_SUNDAY;
+
+    g_calendar.time_zone = NULL;
+
+    g_calendar.primary = NULL;
+
+    load_calendar_list();
+    load_user_settings();
+
+    g_calendar.week = get_week(g_calendar.time_zone, g_calendar.week_start);
+}
+
+void destroy_google_calendar() {
+    free_week(g_calendar.week);
+
+    for (int i = 0; i < g_calendar.num_calendars; ++i) {
+        free(g_calendar.calendars[i].id);
+        free(g_calendar.calendars[i].name);
+    }
+
+    free(g_calendar.calendars);
+
+    free(g_calendar.time_zone);
+}
+
 #ifdef EPD
 
 bdf_t *font_large;

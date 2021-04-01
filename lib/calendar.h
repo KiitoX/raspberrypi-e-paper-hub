@@ -32,6 +32,23 @@ typedef struct {
 t_week get_week(const char *time_zone, int week_start);
 void free_week(t_week week);
 
+typedef struct {
+    char *time_zone;
+    int week_start;
+    t_week week;
+    size_t num_calendars;
+    struct calendar {
+        char *id;
+        char *name;
+    } *calendars;
+    struct calendar *primary;
+} t_google_calendar;
+
+void init_google_calendar();
+void destroy_google_calendar();
+
+void get_events();
+
 #ifdef EPD
 
 #include "epd/ER-EPD0583-1.h"
