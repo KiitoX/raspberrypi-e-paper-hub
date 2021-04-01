@@ -735,7 +735,7 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
 
     while (*string != '\0') {
         offset = mbrtowc(&character, string, MB_CUR_MAX, &state);
-        printf("Paint_DrawString: Character '%lc' U+%04X\n", character, character);
+        printf("Paint_DrawString: Character '%lc' U+%04X with offset %ld\n", character, character, offset);
         if (offset <= 0) {
             printf("Paint_DrawString: String contains invalid UTF-8 characters\n");
             return;
