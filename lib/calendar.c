@@ -173,11 +173,13 @@ t_week get_week(const char *time_zone, int week_start) {
 
     len = strftime(date_buf, len_buf - 1, "%FT%T%z", &week.start);
     week.start_string = calloc(len + 1, sizeof(*week.start_string));
+    assert(week.start_string != NULL);
     strncpy(week.start_string, date_buf, len);
     printf("Starting at: %s\n", week.start_string);
 
     len = strftime(date_buf, len_buf - 1, "%FT%T%z", &week.end);
     week.end_string = calloc(len + 1, sizeof(*week.end_string));
+    assert(week.end_string != NULL);
     strncpy(week.end_string, date_buf, len);
     printf("Ending at: %s\n", week.end_string);
 
@@ -199,6 +201,7 @@ void load_calendar_list() {
         if (json_is_array(json_object_get(j_resp, "items"))) {
             g_calendar.num_calendars = json_array_size(json_object_get(j_resp, "items"));
             g_calendar.calendars = calloc(g_calendar.num_calendars, sizeof(*g_calendar.calendars));
+            assert(g_calendar.calendars != NULL);
 
             json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
                 if (json_is_boolean(json_object_get(j_elem, "hidden"))) {
@@ -210,11 +213,13 @@ void load_calendar_list() {
                     json_t *id = json_object_get(j_elem, "id");
                     assert(json_is_string(id));
                     cal->id = calloc(json_string_length(id) + 1, sizeof(*cal->id));
+                    assert(cal->id != NULL);
                     strncpy(cal->id, json_string_value(id), json_string_length(id));
 
                     json_t *summary = json_object_get(j_elem, "summary");
                     assert(json_is_string(summary));
                     cal->name = calloc(json_string_length(summary) + 1, sizeof(*cal->name));
+                    assert(cal->name != NULL);
                     strncpy(cal->name, json_string_value(summary), json_string_length(summary));
 
                     if (json_is_boolean(json_object_get(j_elem, "primary")) &&
@@ -245,6 +250,7 @@ void load_user_settings() {
                 if (json_is_string(id) && json_is_string(value)) {
                     if (json_equal(id, key_tz)) {
                         g_calendar.time_zone = calloc(json_string_length(value) + 1, sizeof(*g_calendar.time_zone));
+                        assert(g_calendar.time_zone != NULL);
                         strncpy(g_calendar.time_zone, json_string_value(value), json_string_length(value));
                     } else if (json_equal(id, key_week)) {
                         // week start: "0": Sunday, "1": Monday, "6": Saturday
@@ -285,18 +291,24 @@ void load_events() {
             size_t i;
             if (json_is_array(json_object_get(j_resp, "items"))) {
                 cal->num_events = json_array_size(json_object_get(j_resp, "items"));
+                if (cal->num_events == 0) {
+                    continue;
+                }
                 cal->events = calloc(cal->num_events, sizeof(*cal->events));
+                assert(cal->events != NULL);
 
                 json_array_foreach(json_object_get(j_resp, "items"), i, j_elem) {
                     struct event *evt = &cal->events[i];
                     json_t *summary = json_object_get(j_elem, "summary");
                     assert(json_is_string(summary));
                     evt->name = calloc(json_string_length(summary) + 1, sizeof(*evt->name));
+                    assert(evt->name != NULL);
                     strncpy(evt->name, json_string_value(summary), json_string_length(summary));
 
                     json_t *description = json_object_get(j_elem, "description");
                     if (json_is_string(description)) {
                         evt->description = calloc(json_string_length(description) + 1, sizeof(*evt->description));
+                        assert(evt->description != NULL);
                         strncpy(evt->description, json_string_value(description), json_string_length(description));
                     }
 
