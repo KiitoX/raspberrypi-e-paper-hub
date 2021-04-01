@@ -508,8 +508,6 @@ void draw_event(char *text, uint16_t offset, uint16_t length, uint16_t day_of_we
 }
 
 void draw_events() {
-    char buf[128];
-
     for (int i = 0; i < g_calendar.num_calendars; ++i) {
         struct calendar *cal = &g_calendar.calendars[i];
 
@@ -521,9 +519,6 @@ void draw_events() {
             } else {
                 int offset = (evt->start.tm_hour - hour_start) * 4 + (evt->start.tm_min) / 30;
                 int length = (evt->end.tm_hour - evt->start.tm_hour) * 4 + (evt->end.tm_min - evt->start.tm_min) / 30;
-
-                strftime(buf, 127, "%a %F %T", &evt->start);
-                printf("'%s'[%ld] on %s, at %d+%d\n", evt->name, strlen(evt->name), buf, offset, length);
 
                 draw_event(evt->name, offset, length, evt->start.tm_wday);
             }
