@@ -54,7 +54,7 @@ int create_session() {
     // https://developers.google.com/calendar/auth
     // https://calendar-json.googleapis.com/$discovery/rest?version=v3
     i_set_parameter_list(&i_session,
-                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE | I_RESPONSE_TYPE_TOKEN,
+                         I_OPT_RESPONSE_TYPE, 0b11,
                          I_OPT_OPENID_CONFIG_ENDPOINT, GAPI_CONFIG_ENDPOINT,
                          I_OPT_CLIENT_ID, GAPI_CLIENT_ID,
                          I_OPT_CLIENT_SECRET, GAPI_CLIENT_SECRET,
