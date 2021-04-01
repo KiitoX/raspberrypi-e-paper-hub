@@ -517,8 +517,8 @@ void draw_events() {
             if (evt->all_day) {
                 // TODO
             } else {
-                int offset = (evt->start.tm_hour - hour_start) * 4 + (evt->start.tm_min) / 30;
-                int length = (evt->end.tm_hour - evt->start.tm_hour) * 4 + (evt->end.tm_min - evt->start.tm_min) / 30;
+                int offset = (evt->start.tm_hour - hour_start) * 2 + (evt->start.tm_min) / 30;
+                int length = (evt->end.tm_hour - evt->start.tm_hour) * 2 + (evt->end.tm_min - evt->start.tm_min) / 30;
 
                 draw_event(evt->name, offset, length, evt->start.tm_wday);
             }
