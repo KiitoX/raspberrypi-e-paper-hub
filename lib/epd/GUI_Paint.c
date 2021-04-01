@@ -745,15 +745,6 @@ void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *fon
             return;
         }
 
-        // skip leading whitespace
-        if (character == ' ') {
-            printf("Skip??? %d == %d\n", x, xPos);
-            if (x == xPos) {
-                string++;
-                continue;
-            }
-        }
-
         // move to new line, and skip newline character
         if (character == '\n') {
             x = xPos;
@@ -770,6 +761,15 @@ void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *fon
             } else {
                 printf("Paint_DrawString: String does not fit horizontally\n");
                 return;
+            }
+        }
+
+        // skip leading whitespace
+        if (character == ' ') {
+            printf("Skip??? %d == %d\n", x, xPos);
+            if (x == xPos) {
+                string++;
+                continue;
             }
         }
 
