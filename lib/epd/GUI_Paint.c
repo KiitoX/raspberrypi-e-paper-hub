@@ -719,6 +719,9 @@ int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UW
 }
 
 void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg, UWORD width, UWORD height, bool wrap) {
+    width = xPos + width;
+    height = yPos + height;
+
     if (xPos > width || yPos > height) {
         Debug("Paint_DrawString: Input exceeds boundary\n");
         return;
@@ -773,7 +776,7 @@ void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *fon
 }
 
 void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg) {
-    Paint_DrawStringRect(xPos, yPos, string, font, color_fg, color_bg, Paint.Width, Paint.Height, true);
+    Paint_DrawStringRect(xPos, yPos, string, font, color_fg, color_bg, Paint.Width - xPos, Paint.Height - yPos, true);
 }
 
 void Paint_DrawCharmap(UWORD xPos, UWORD yPos, bdf_t *font, size_t offset, UWORD color_fg, UWORD color_bg) {
