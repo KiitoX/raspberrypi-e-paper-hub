@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <locale.h>
+#include <wchar.h>
 
 #include "lib/bdf.h"
 #include "lib/calendar.h"
@@ -22,6 +23,12 @@ int main() {
     // disable locale specific string handling
     // enables UTF-8 to multi-byte handling
     setlocale(LC_ALL, "");
+
+    // If this fails, your current locale does not support UTF-8.
+    // If you're /really/ fine with just ASCII, just remove this test.
+    // If you SSH onto the system, and have disabled PAM, the locale config will not be respected.
+    // You will want the values shown by `locale` to end in .UTF-8
+    assert(MB_CUR_MAX == 6);
 
 #ifdef EPD
     signal(SIGINT, signal_handler);

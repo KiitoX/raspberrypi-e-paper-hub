@@ -496,8 +496,6 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, const char *text, uint16_t
         Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     }
 
-    printf("Trying to draw '%s'\n", text);
-
     if (!today && !passed) {
         Paint_SelectImage(image_red);
         Paint_DrawString(x - 2, y - 2, text, font_small, RED, WHITE);
