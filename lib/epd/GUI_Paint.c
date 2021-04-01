@@ -742,7 +742,7 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
 
             printf("Hexdump:");
             for (int i = 0; i < strlen(string); ++i) {
-                printf(" %2x", string[i]);
+                printf(" %2x (%d)", string[i], string[i]);
             }
             puts("");
             return;
