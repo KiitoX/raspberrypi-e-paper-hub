@@ -511,11 +511,16 @@ void draw_events() {
     char buf[128];
 
     for (int i = 0; i < g_calendar.num_calendars; ++i) {
-        struct calendar *cal = &g_calendar.calendars[i];
-        for (int j = 0; j < cal->num_events; ++j) {
-            struct event *evt = &cal->events[j];
+        printf("i:%d\n", i);
 
+        struct calendar *cal = &g_calendar.calendars[i];
+        printf("cal:%s\n", cal->name);
+
+        for (int j = 0; j < cal->num_events; ++j) {
             printf("i:%d j:%d\n", i, j);
+
+            struct event *evt = &cal->events[j];
+            printf("evt:%s\n", evt->name);
 
             if (evt->all_day) {
                 // TODO
