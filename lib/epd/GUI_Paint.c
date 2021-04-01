@@ -746,9 +746,12 @@ void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *fon
         }
 
         // skip leading whitespace
-        if (character == ' ' && x == xPos) {
-            string++;
-            continue;
+        if (character == ' ') {
+            printf("Skip??? %d == %d\n", x, xPos);
+            if (x == xPos) {
+                string++;
+                continue;
+            }
         }
 
         // move to new line, and skip newline character
