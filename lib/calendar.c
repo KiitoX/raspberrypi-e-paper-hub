@@ -475,18 +475,18 @@ void draw_calendar() {
     Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
 }
 
-void draw_event(char *text, uint16_t quarter_offset, uint16_t quarter_length, uint16_t day_of_week) {
-    // the offset and length is in 15 min segments, which are round down/up
+void draw_event(char *text, uint16_t offset, uint16_t length, uint16_t day_of_week) {
+    // the offset and length is in 30 min segments, which are round down/up
 
     uint16_t x = 65 + day_of_week * 82;
     uint16_t w = 74;
-    uint16_t y = 104 + (quarter_offset / 2) * 26 + (quarter_offset % 2) * 12;
-    uint16_t skip_borders = (quarter_offset % 2) ? ((quarter_length / 2) * 3 + ((quarter_length - 1) / 2) * 1) : ((quarter_length / 2) * 1 + ((quarter_length - 1) / 2) * 3);
-    uint16_t h = quarter_length * 11 + skip_borders;
+    uint16_t y = 104 + (offset / 2) * 26 + (offset % 2) * 12;
+    uint16_t skip_borders = (offset % 2) ? ((length / 2) * 3 + ((length - 1) / 2) * 1) : ((length / 2) * 1 + ((length - 1) / 2) * 3);
+    uint16_t h = length * 11 + skip_borders;
 
     int weekday_today = g_calendar.week.today.tm_wday;
     bool today = day_of_week == weekday_today;
-    bool passed = day_of_week < weekday_today || (today && (quarter_offset + quarter_length) < 6);
+    bool passed = day_of_week < weekday_today || (today && (offset + length) < 6);
 
     if (today && !passed) {
         Paint_SelectImage(image_red);
@@ -521,8 +521,8 @@ void draw_events() {
             if (evt->all_day) {
                 // TODO
             } else {
-                int offset = (evt->start.tm_hour - hour_start) * 4 + (evt->start.tm_min) / 15;
-                int length = (evt->end.tm_hour - evt->start.tm_hour) * 4 + (evt->end.tm_min - evt->start.tm_min) / 15;
+                int offset = (evt->start.tm_hour - hour_start) * 4 + (evt->start.tm_min) / 30;
+                int length = (evt->end.tm_hour - evt->start.tm_hour) * 4 + (evt->end.tm_min - evt->start.tm_min) / 30;
 
                 strftime(buf, 127, "%a %F %T", &evt->start);
                 printf("'%s' on %s, at %d+%d\n", evt->name, buf, offset, length);

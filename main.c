@@ -123,6 +123,9 @@ int main() {
     draw_events();
 #endif
 
+    EPD_0583_1_Display(image_black, image_red);
+    DEV_Delay_ms(3000);
+
     exit(0); // quit early
 #endif
 
