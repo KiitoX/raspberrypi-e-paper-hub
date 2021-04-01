@@ -370,13 +370,7 @@ bdf_t *font_medium;
 bdf_t *font_small;
 bdf_t *font_icons;
 
-UBYTE *image_black;
-UBYTE *image_red;
-
-void init_calendar(UBYTE *image_black_, UBYTE *image_red_) {
-    image_black = image_black_;
-    image_red = image_red_;
-
+void init_calendar() {
     font_large = bdf_read("./fonts/LodeSans-15.bdf", 2);
     font_large_mono = bdf_read("./fonts/LodeSansMono-15.bdf", 2);
     font_medium = bdf_read("./fonts/cozette.bdf", 2);
@@ -386,9 +380,6 @@ void init_calendar(UBYTE *image_black_, UBYTE *image_red_) {
 }
 
 void destroy_calendar() {
-    image_black = NULL;
-    image_red = NULL;
-
     bdf_free(font_large);
     bdf_free(font_large_mono);
     bdf_free(font_medium);
@@ -399,7 +390,7 @@ void destroy_calendar() {
 const int hour_start = 7;
 const int hour_segments = 14;
 
-void draw_calendar() {
+void draw_calendar(UBYTE *image_black, UBYTE *image_red) {
     int w = EPD_0583_1_WIDTH, h = EPD_0583_1_HEIGHT;
 
     size_t buf_size = 64;
@@ -472,7 +463,7 @@ void draw_calendar() {
     Paint_DrawString(20, 20, buf, font_large, BLACK, WHITE);
 }
 
-void draw_event(char *text, uint16_t offset, uint16_t length, uint16_t day_of_week) {
+void draw_event(UBYTE *image_black, UBYTE *image_red, const char *text, uint16_t offset, uint16_t length, uint16_t day_of_week) {
     // the offset and length is in 30 min segments, which are round down/up
 
     uint16_t x = 65 + day_of_week * 82;
@@ -493,6 +484,8 @@ void draw_event(char *text, uint16_t offset, uint16_t length, uint16_t day_of_we
         Paint_DrawRectangle(x, y, x + w, y + h, WHITE, DOT_PIXEL_1X1, DRAW_FILL_FULL);
     }
 
+    printf("Trying to draw '%s'\n", text);
+
     if (!today && !passed) {
         Paint_SelectImage(image_red);
         Paint_DrawString(x - 2, y - 2, text, font_small, RED, WHITE);
@@ -507,7 +500,7 @@ void draw_event(char *text, uint16_t offset, uint16_t length, uint16_t day_of_we
     }
 }
 
-void draw_events() {
+void draw_events(UBYTE *image_black, UBYTE *image_red) {
     for (int i = 0; i < g_calendar.num_calendars; ++i) {
         struct calendar *cal = &g_calendar.calendars[i];
 
@@ -520,7 +513,7 @@ void draw_events() {
                 int offset = (evt->start.tm_hour - hour_start) * 2 + (evt->start.tm_min) / 30;
                 int length = (evt->end.tm_hour - evt->start.tm_hour) * 2 + (evt->end.tm_min - evt->start.tm_min) / 30;
 
-                draw_event(evt->name, offset, length, evt->start.tm_wday);
+                draw_event(image_black, image_red, evt->name, offset, length, evt->start.tm_wday);
             }
         }
     }

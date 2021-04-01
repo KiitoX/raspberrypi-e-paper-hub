@@ -61,10 +61,10 @@ void load_events();
 #include "epd/ER-EPD0583-1.h"
 #include "epd/GUI_Paint.h"
 
-void init_calendar(UBYTE *image_black_, UBYTE *image_red_);
+void init_calendar();
 void destroy_calendar();
 
-void draw_calendar();
-void draw_events();
+void draw_calendar(UBYTE *image_black, UBYTE *image_red);
+void draw_events(UBYTE *image_black, UBYTE *image_red);
 
 #endif

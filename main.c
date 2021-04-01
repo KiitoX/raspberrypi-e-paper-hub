@@ -49,6 +49,8 @@ int main() {
     init_google_calendar();
 #endif
 
+    init_calendar();
+
 #ifdef EPD
     assert(DEV_Module_Init() == 0);
 
@@ -69,8 +71,6 @@ int main() {
 
     Paint_NewImage(image_black, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_180, WHITE);
     Paint_NewImage(image_red, EPD_0583_1_WIDTH, EPD_0583_1_HEIGHT, ROTATE_180, WHITE);
-
-    init_calendar(image_black, image_red);
 #endif
 
     /**
@@ -115,12 +115,12 @@ int main() {
 #endif
 
 #ifdef EPD
-    draw_calendar();
+    draw_calendar(image_black, image_red);
 
 #ifdef GAPI
     load_events();
 
-    draw_events();
+    draw_events(image_black, image_red);
 #endif
 
     EPD_0583_1_Display(image_black, image_red);
@@ -168,9 +168,9 @@ int main() {
      * Cleanup
      */
 
-#ifdef EPD
     destroy_calendar();
 
+#ifdef EPD
     EPD_0583_1_Clear();
 
     EPD_0583_1_Sleep();
