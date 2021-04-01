@@ -151,6 +151,10 @@ void read_character(char *buffer, size_t buf_len, FILE *bdf_file, bdf_t *font, b
     assert(starts_with(buffer, "ENDCHAR"));
 }
 
+int compare_bitmap(const void *a, const void *b) {
+    return (((bitmap_t *)a)->encoding) - (((bitmap_t *)b)->encoding);
+}
+
 bdf_t *bdf_read(const char *file_name, uint8_t scale) {
     size_t buf_len = 250;
     char *buffer = malloc(sizeof(*buffer) * buf_len);
@@ -179,12 +183,14 @@ bdf_t *bdf_read(const char *file_name, uint8_t scale) {
     printf("scan: chars = %lu\n\n", font->numChars);
 #endif
 
-    font->characters = malloc(sizeof(*font->characters) * font->numChars);
+    font->characters = calloc(font->numChars, sizeof(*font->characters));
     assert(font->characters != NULL);
 
     for (int i = 0; i < font->numChars; ++i) {
         read_character(buffer, buf_len, bdf_file, font, &font->characters[i]);
     }
+
+    qsort(font->characters, font->numChars, sizeof(*font->characters), compare_bitmap);
 
     assert(fgets(buffer, buf_len, bdf_file) != NULL);
     assert(starts_with(buffer, "ENDFONT"));
