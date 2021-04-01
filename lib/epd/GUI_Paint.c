@@ -718,7 +718,7 @@ int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UW
     return bitmap->deviceWidth * font->scale;
 }
 
-void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg, UWORD width, UWORD height, bool wrap) {
+void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg, UWORD width, UWORD height, bool wrap, UWORD line_height) {
     width = xPos + width;
     height = yPos + height;
 
@@ -754,16 +754,16 @@ void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *fon
         // move to new line, and skip newline character
         if (character == '\n') {
             x = xPos;
-            y += font->height * font->scale;
+            y += line_height;
             string++;
             continue;
         }
 
         // move to new line at x boundary
-        if ((x + font->width * font->scale) > width) {
+        if ((x + line_height) > width) {
             if (wrap) {
                 x = xPos;
-                y += font->height * font->scale;
+                y += line_height;
             } else {
                 printf("Paint_DrawString: String does not fit horizontally\n");
                 return;
@@ -771,7 +771,7 @@ void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *fon
         }
 
         // return early at y boundary
-        if ((y + font->height * font->scale) > height) {
+        if ((y + line_height) > height) {
             printf("Paint_DrawString: String does not fit vertically\n");
             return;
         }
@@ -782,7 +782,7 @@ void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *fon
 }
 
 void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg) {
-    Paint_DrawStringRect(xPos, yPos, string, font, color_fg, color_bg, Paint.Width - xPos, Paint.Height - yPos, true);
+    Paint_DrawStringRect(xPos, yPos, string, font, color_fg, color_bg, Paint.Width - xPos, Paint.Height - yPos, true, font->height * font->scale);
 }
 
 void Paint_DrawCharmap(UWORD xPos, UWORD yPos, bdf_t *font, size_t offset, UWORD color_fg, UWORD color_bg) {

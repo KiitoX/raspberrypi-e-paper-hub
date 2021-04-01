@@ -146,7 +146,7 @@ void Paint_DrawTime(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, sFONT* Font, 
 #include "../bdf.h"
 int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UWORD color_fg, UWORD color_bg);
 void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg);
-void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg, UWORD width, UWORD height, bool wrap);
+void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg, UWORD width, UWORD height, bool wrap, UWORD line_height);
 void Paint_DrawCharmap(UWORD xPos, UWORD yPos, bdf_t *font, size_t offset, UWORD color_fg, UWORD color_bg);
 #endif
 

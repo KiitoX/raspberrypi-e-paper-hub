@@ -498,15 +498,15 @@ void draw_event(UBYTE *image_black, UBYTE *image_red, const char *text, uint16_t
 
     if (!today && !passed) {
         Paint_SelectImage(image_red);
-        Paint_DrawStringRect(x - 2, y - 2, text, font_small, RED, WHITE, w + 4, h + 4, true);
+        Paint_DrawStringRect(x - 2, y - 2, text, font_small, RED, WHITE, w + 4, h + 4, true, 12);
     } else if (today && !passed) {
         Paint_SelectImage(image_red);
-        Paint_DrawStringRect(x - 2, y - 2, text, font_small, WHITE, WHITE, w + 4, h + 4, true);
+        Paint_DrawStringRect(x - 2, y - 2, text, font_small, WHITE, WHITE, w + 4, h + 4, true, 12);
         Paint_SelectImage(image_black);
-        Paint_DrawStringRect(x - 2, y - 2, text, font_small, WHITE, WHITE, w + 4, h + 4, true);
+        Paint_DrawStringRect(x - 2, y - 2, text, font_small, WHITE, WHITE, w + 4, h + 4, true, 12);
     } else {
         Paint_SelectImage(image_black);
-        Paint_DrawStringRect(x - 2, y - 2, text, font_small, BLACK, WHITE, w + 4, h + 4, true);
+        Paint_DrawStringRect(x - 2, y - 2, text, font_small, BLACK, WHITE, w + 4, h + 4, true, 12);
     }
 }
 
