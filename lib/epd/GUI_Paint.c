@@ -685,13 +685,13 @@ void Paint_DrawTime(UWORD Xstart, UWORD Ystart, PAINT_TIME *pTime, sFONT* Font,
 
 int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UWORD color_fg, UWORD color_bg) {
     if (xPos > Paint.Width || yPos > Paint.Height) {
-        printf("Paint_DrawChar: Input exceeds display boundary\n");
+        Debug("Paint_DrawChar: Input exceeds display boundary\n");
         return 0;
     }
 
     bitmap_t *bitmap = bdf_get_bitmap(font, character);
     if (bitmap == NULL) {
-        printf("Paint_DrawChar: Character '%lc' U+%04X is not in bitmap\n",  character, character);
+        Debug("Paint_DrawChar: Character '%lc' U+%04X is not in bitmap\n",  character, character);
         return 0;
     }
 
@@ -735,9 +735,10 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
 
     while (*string != '\0') {
         offset = mbrtowc(&character, string, MB_CUR_MAX, &state);
-        printf("Paint_DrawString: Character '%lc' U+%04X with offset %ld\n", character, character, offset);
-        if (offset <= 0) {
-            printf("Paint_DrawString: String contains invalid UTF-8 characters\n");
+        if (offset == 0) {
+            assert(false && "We should not get here");
+        } else if (offset >= ((size_t)-2)) {
+            Debug("Paint_DrawString: String contains invalid UTF-8 characters\n");
             return;
         }
 
