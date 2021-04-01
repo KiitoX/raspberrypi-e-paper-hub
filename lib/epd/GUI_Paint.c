@@ -718,9 +718,9 @@ int Paint_DrawChar(UWORD xPos, UWORD yPos, encoding_t character, bdf_t *font, UW
     return bitmap->deviceWidth * font->scale;
 }
 
-void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg) {
-    if (xPos > Paint.Width || yPos > Paint.Height) {
-        Debug("Paint_DrawString: Input exceeds display boundary\n");
+void Paint_DrawStringRect(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg, UWORD width, UWORD height, bool wrap) {
+    if (xPos > width || yPos > height) {
+        Debug("Paint_DrawString: Input exceeds boundary\n");
         return;
     }
 
@@ -739,12 +739,6 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
             assert(false && "We should not get here");
         } else if (offset >= ((size_t)-2)) {
             Debug("Paint_DrawString: String '%s' contains invalid UTF-8 characters (%ld)\n", string, offset);
-
-            printf("Hexdump:");
-            for (int i = 0; i < strlen(string); ++i) {
-                printf(" %2x (%d)", string[i], string[i]);
-            }
-            puts("");
             return;
         }
 
@@ -757,20 +751,29 @@ void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, U
         }
 
         // move to new line at x boundary
-        if ((x + font->width * font->scale) > Paint.Width) {
-            x = xPos;
-            y += font->height * font->scale;
+        if ((x + font->width * font->scale) > width) {
+            if (wrap) {
+                x = xPos;
+                y += font->height * font->scale;
+            } else {
+                printf("Paint_DrawString: String does not fit horizontally\n");
+                return;
+            }
         }
 
-        // return to beginning at y boundary
-        if ((y + font->height * font->scale) > Paint.Height) {
-            x = xPos;
-            y = yPos;
+        // return early at y boundary
+        if ((y + font->height * font->scale) > height) {
+            printf("Paint_DrawString: String does not fit vertically\n");
+            return;
         }
 
         x += Paint_DrawChar(x, y, character, font, color_fg, color_bg);
         string += offset;
     }
+}
+
+void Paint_DrawString(UWORD xPos, UWORD yPos, const char *string, bdf_t *font, UWORD color_fg, UWORD color_bg) {
+    Paint_DrawStringRect(xPos, yPos, string, font, color_fg, color_bg, Paint.Width, Paint.Height, true);
 }
 
 void Paint_DrawCharmap(UWORD xPos, UWORD yPos, bdf_t *font, size_t offset, UWORD color_fg, UWORD color_bg) {
