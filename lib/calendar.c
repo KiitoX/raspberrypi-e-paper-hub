@@ -137,6 +137,9 @@ json_t *api_request(const char *url) {
 }
 
 void close_session() {
+    char *oauth2_session = i_export_session_str(&i_session);
+    printf("%s\n", oauth2_session);
+
     i_clean_session(&i_session);
 
     y_close_logs();
