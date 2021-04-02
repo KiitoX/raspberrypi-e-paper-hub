@@ -62,7 +62,7 @@ int create_session() {
     // https://developers.google.com/calendar/auth
     // https://calendar-json.googleapis.com/$discovery/rest?version=v3
     i_set_parameter_list(&i_session,
-                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE,
+                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE | I_RESPONSE_TYPE_REFRESH_TOKEN,
                          I_OPT_OPENID_CONFIG_ENDPOINT, GAPI_CONFIG_ENDPOINT,
                          I_OPT_CLIENT_ID, GAPI_CLIENT_ID,
                          I_OPT_CLIENT_SECRET, GAPI_CLIENT_SECRET,
@@ -94,6 +94,8 @@ int create_session() {
     json_array_append_new(scopes_supported, json_string("https://www.googleapis.com/auth/calendar.events.readonly"));
     json_array_append_new(scopes_supported, json_string("https://www.googleapis.com/auth/calendar.settings.readonly"));
 
+    // i_set_additional_parameter(&i_session, "prompt", "consent");
+
     // First step: get redirection to login page
     if ((ret = i_build_auth_url_get(&i_session)) != I_OK) {
         printf("Error building auth request %d\n", ret);
@@ -103,13 +105,11 @@ int create_session() {
 
     printf("Redirect to %s\n", i_get_str_parameter(&i_session, I_OPT_REDIRECT_TO));
 
+    // When the user has logged in the external application, gets redirected with a result, we parse the result
     printf("Enter Redirect URL: ");
     char redirect_url[4097] = {0};
     fgets(redirect_url, 4096, stdin);
     redirect_url[strlen(redirect_url) - 1] = '\0';
-
-    printf("Got redirect [%lu]'%s'\n", strlen(redirect_url), redirect_url);
-
     i_set_str_parameter(&i_session, I_OPT_REDIRECT_TO, redirect_url);
     if (i_parse_redirect_to(&i_session) != I_OK) {
         printf("Error parsing redirect url\n");
@@ -118,13 +118,12 @@ int create_session() {
     }
 
     time_t now = time(NULL);
+    // Run the token request, get the refresh and access tokens
     if (i_run_token_request(&i_session) != I_OK) {
         printf("Error running token request\n");
         close_session();
         return I_ERROR;
     }
-
-    printf("Do we have refresh: %s\n", i_get_str_parameter(&i_session, I_OPT_REFRESH_TOKEN));
 
     printf("What is expires: %ld, (in %d)\n", i_session.expires_at, i_session.expires_in);
     // this is something the lib is supposed to do itself, but it doesn't so eyyyy
