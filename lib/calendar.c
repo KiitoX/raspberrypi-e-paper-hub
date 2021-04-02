@@ -123,7 +123,9 @@ int create_session() {
         return 1;
     }
 
-    printf("What is expires: %ld\n", i_session.expires_at);
+    printf("Do we have refresh: %s\n", i_get_str_parameter(&i_session, I_OPT_REFRESH_TOKEN));
+
+    printf("What is expires: %ld, (in %d)\n", i_session.expires_at, i_session.expires_in);
     // this is something the lib is supposed to do itself, but it doesn't so eyyyy
     i_session.expires_at = now + ((time_t)i_session.expires_in);
     printf("Set expires: %ld\n", i_session.expires_at);
