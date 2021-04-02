@@ -182,6 +182,9 @@ void export_session() {
     json_t *j_session = i_export_session_json_t(&i_session);
     assert(j_session != NULL);
 
+    char *full_path = realpath(session_store, NULL);
+    printf("Exporting session to %s\n", full_path);
+    free(full_path);
     int ret = json_dump_file(j_session, session_store, 0);
 
     json_decref(j_session);
