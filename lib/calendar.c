@@ -62,7 +62,7 @@ int create_session() {
     // https://developers.google.com/calendar/auth
     // https://calendar-json.googleapis.com/$discovery/rest?version=v3
     i_set_parameter_list(&i_session,
-                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE | I_RESPONSE_TYPE_REFRESH_TOKEN,
+                         I_OPT_RESPONSE_TYPE, I_RESPONSE_TYPE_CODE,
                          I_OPT_OPENID_CONFIG_ENDPOINT, GAPI_CONFIG_ENDPOINT,
                          I_OPT_CLIENT_ID, GAPI_CLIENT_ID,
                          I_OPT_CLIENT_SECRET, GAPI_CLIENT_SECRET,
@@ -94,7 +94,8 @@ int create_session() {
     json_array_append_new(scopes_supported, json_string("https://www.googleapis.com/auth/calendar.events.readonly"));
     json_array_append_new(scopes_supported, json_string("https://www.googleapis.com/auth/calendar.settings.readonly"));
 
-    // i_set_additional_parameter(&i_session, "prompt", "consent");
+    i_set_additional_parameter(&i_session, "access_type", "offline");
+    i_set_additional_parameter(&i_session, "prompt", "consent");
 
     // First step: get redirection to login page
     if ((ret = i_build_auth_url_get(&i_session)) != I_OK) {
@@ -127,8 +128,8 @@ int create_session() {
 
     printf("What is expires: %ld, (in %d)\n", i_session.expires_at, i_session.expires_in);
     // this is something the lib is supposed to do itself, but it doesn't so eyyyy
-    // i_session.expires_at = now + ((time_t)i_session.expires_in);
-    // printf("Set expires: %ld\n", i_session.expires_at);
+    i_session.expires_at = now + ((time_t)i_session.expires_in);
+    printf("Set expires: %ld\n", i_session.expires_at);
 
     printf("init with access: %s, refresh: %s\n", i_get_str_parameter(&i_session, I_OPT_ACCESS_TOKEN), i_get_str_parameter(&i_session, I_OPT_REFRESH_TOKEN));
 
