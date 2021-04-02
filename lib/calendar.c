@@ -163,9 +163,8 @@ json_t *get_api_response(struct _u_request req) {
     ulfius_init_response(&resp);
 
     int ret = i_perform_api_request(&i_session, &req, &resp, true, I_BEARER_TYPE_HEADER, false, false);
-    if (ret == I_OK && resp.status == 200) {
-        j_resp = ulfius_get_json_body_response(&resp, NULL);
-    }
+    assert(ret == I_OK && resp.status == 200);
+    j_resp = ulfius_get_json_body_response(&resp, NULL);
 
     ulfius_clean_request(&req);
     ulfius_clean_response(&resp);
