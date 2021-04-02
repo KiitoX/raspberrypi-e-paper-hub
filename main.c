@@ -136,8 +136,6 @@ int main() {
         load_events();
 
         draw_events(image_black, image_red);
-
-        refresh_token();
 #endif
 
         EPD_0583_1_Display(image_black, image_red);
