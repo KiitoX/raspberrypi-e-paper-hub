@@ -17,4 +17,4 @@ cmake -DCMAKE_BUILD_TYPE="Debug" -G Ninja .. || exit
 ninja || exit
 
 cd ..
-sudo build/epaper
+sudo gdb build/epaper -ex run
