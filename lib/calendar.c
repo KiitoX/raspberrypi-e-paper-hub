@@ -49,7 +49,11 @@ int create_session() {
     i_init_session(&i_session);
 
     if (import_session() == I_OK) {
+        printf("Imported OAuth2 Session from file\n");
         return 0;
+    } else {
+        i_clean_session(&i_session);
+        i_init_session(&i_session);
     }
 
     // Details on these parameters:
