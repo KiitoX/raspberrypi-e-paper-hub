@@ -164,8 +164,12 @@ json_t *get_api_response(struct _u_request req) {
     ulfius_init_response(&resp);
 
     int ret = i_perform_api_request(&i_session, &req, &resp, true, I_BEARER_TYPE_HEADER, false, false);
-    assert(ret == I_OK && resp.status == 200);
-    j_resp = ulfius_get_json_body_response(&resp, NULL);
+    assert(ret == I_OK);
+    if (resp.status == 200) {
+        j_resp = ulfius_get_json_body_response(&resp, NULL);
+    } else {
+        printf("Request %s '%s' failed with status %ld\n", req.http_verb, req.http_url, resp.status);
+    }
 
     ulfius_clean_request(&req);
     ulfius_clean_response(&resp);
