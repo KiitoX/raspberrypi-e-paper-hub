@@ -173,7 +173,8 @@ json_t *api_request(const char *url) {
     return get_api_response(req);
 }
 
-void export_session() {
+void close_session() {
+#ifdef GAPI_STORE_OAUTH
     json_t *j_session = i_export_session_json_t(&i_session);
     assert(j_session != NULL);
 
@@ -187,10 +188,7 @@ void export_session() {
     if (ret != 0) {
         printf("Failed to store session\n");
     }
-}
-
-void close_session() {
-    export_session();
+#endif
 
     i_clean_session(&i_session);
 
