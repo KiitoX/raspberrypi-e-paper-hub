@@ -50,7 +50,7 @@ int create_session() {
 
     if (import_session() == I_OK) {
         printf("Imported OAuth2 Session from file\n");
-        return 0;
+        return I_OK;
     } else {
         printf("Loading Session from file failed\n");
         i_clean_session(&i_session);
@@ -80,7 +80,7 @@ int create_session() {
     if (i_load_openid_config(&i_session) != I_OK) {
         printf("Error loading openid-config\n");
         close_session();
-        return 1;
+        return I_ERROR;
     }
 
     json_t *scopes_supported = json_object_get(i_session.openid_config, "scopes_supported");
@@ -94,10 +94,11 @@ int create_session() {
     json_array_append_new(scopes_supported, json_string("https://www.googleapis.com/auth/calendar.events.readonly"));
     json_array_append_new(scopes_supported, json_string("https://www.googleapis.com/auth/calendar.settings.readonly"));
 
+    // First step: get redirection to login page
     if ((ret = i_build_auth_url_get(&i_session)) != I_OK) {
         printf("Error building auth request %d\n", ret);
         close_session();
-        return 1;
+        return I_ERROR;
     }
 
     printf("Redirect to %s\n", i_get_str_parameter(&i_session, I_OPT_REDIRECT_TO));
@@ -113,39 +114,26 @@ int create_session() {
     if (i_parse_redirect_to(&i_session) != I_OK) {
         printf("Error parsing redirect url\n");
         close_session();
-        return 1;
+        return I_ERROR;
     }
 
     time_t now = time(NULL);
     if (i_run_token_request(&i_session) != I_OK) {
         printf("Error running token request\n");
         close_session();
-        return 1;
+        return I_ERROR;
     }
 
     printf("Do we have refresh: %s\n", i_get_str_parameter(&i_session, I_OPT_REFRESH_TOKEN));
 
     printf("What is expires: %ld, (in %d)\n", i_session.expires_at, i_session.expires_in);
     // this is something the lib is supposed to do itself, but it doesn't so eyyyy
-    i_session.expires_at = now + ((time_t)i_session.expires_in);
-    printf("Set expires: %ld\n", i_session.expires_at);
+    // i_session.expires_at = now + ((time_t)i_session.expires_in);
+    // printf("Set expires: %ld\n", i_session.expires_at);
 
     printf("init with access: %s, refresh: %s\n", i_get_str_parameter(&i_session, I_OPT_ACCESS_TOKEN), i_get_str_parameter(&i_session, I_OPT_REFRESH_TOKEN));
 
-    return 0;
-}
-
-int refresh_token() {
-    time_t now = time(NULL);
-    if (i_run_token_request(&i_session) != I_OK) {
-        printf("Error running refresh token request\n");
-        close_session();
-        return 1;
-    }
-
-    // this is something the lib is supposed to do itself, but it doesn't so eyyyy
-    i_session.expires_at = now + ((time_t)i_session.expires_in);
-    return 0;
+    return I_OK;
 }
 
 struct _u_request init_api_request(const char *url) {

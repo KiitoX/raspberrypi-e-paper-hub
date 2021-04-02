@@ -51,7 +51,7 @@ int main() {
 #endif
 
 #ifdef GAPI
-    create_session();
+    assert(create_session() == I_OK);
 
     init_google_calendar();
 #endif
